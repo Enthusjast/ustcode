@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UstCode</title>
+    <meta name="description" content="开源的 AI Coding Agent。UstCode 是一个终端 AI 编码代理。" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --fg: #1a1a1a;
+        --muted: #6b7280;
+        --bg: #ffffff;
+        --accent: #f97316;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --fg: #f3f4f6;
+          --muted: #9ca3af;
+          --bg: #111827;
+          --accent: #fb923c;
+        }
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+      pre.logo {
+        font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+        font-size: 0.9rem;
+        line-height: 1.15;
+        color: var(--fg);
+        margin-bottom: 1.5rem;
+        white-space: pre;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      h1 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+      p.desc { color: var(--muted); margin-bottom: 2rem; text-align: center; max-width: 40rem; }
+      nav { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+      a {
+        color: var(--fg);
+        text-decoration: none;
+        border: 1px solid var(--muted);
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        transition: border-color 0.2s, color 0.2s;
+      }
+      a:hover { border-color: var(--accent); color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <pre class="logo">██╗   ██╗███████╗████████╗ ██████╗ ██████╗ ██████╗ ███████╗
+██║   ██║██╔════╝╚══██╔══╝██╔════╝██╔═══██╗██╔══██╗██╔════╝
+██║   ██║███████╗   ██║   ██║     ██║   ██║██║  ██║█████╗
+██║   ██║╚════██║   ██║   ██║     ██║   ██║██║  ██║██╔══╝
+╚██████╔╝███████║   ██║   ╚██████╗╚██████╔╝██████╔╝███████╗
+ ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝</pre>
+    <h1>UstCode</h1>
+    <p class="desc">开源的 AI Coding Agent。终端里的 AI 编码助手，内置 USTC 模型接入。</p>
+    <nav>
+      <a href="https://github.com/Enthusjast/ustcode">GitHub</a>
+      <a href="https://github.com/Enthusjast/ustcode/releases">Releases</a>
+      <a href="/config.json">config.json</a>
+      <a href="/tui.json">tui.json</a>
+      <a href="/openapi.json">openapi.json</a>
+    </nav>
+  </body>
+</html>
