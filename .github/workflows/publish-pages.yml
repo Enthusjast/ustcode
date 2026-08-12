@@ -1,0 +1,56 @@
+name: publish-pages
+
+# Regenerates the JSON schemas and republishes the gh-pages branch so
+# ustcode.enthusjast.cc stays in sync with the source (install, config-schema,
+# tui-schema, openapi).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install"
+      - "install.ps1"
+      - "config-schema.json"
+      - "tui-schema.json"
+      - "packages/sdk/openapi.json"
+      - ".github/workflows/publish-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-pages:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-bun
+
+      - name: Regenerate schemas
+        run: |
+          bun run --cwd packages/ustcode generate:config-schema
+          bun run --cwd packages/ustcode generate:tui-schema
+
+      - name: Update gh-pages branch
+        run: |
+          git config --global user.email "enthusjast@outlook.com"
+          git config --global user.name "Enthusjast"
+          rm -rf gh-pages-wo
+          git worktree add gh-pages-wo gh-pages
+          cp install gh-pages-wo/install
+          cp install.ps1 gh-pages-wo/install.ps1
+          cp config-schema.json gh-pages-wo/config.json
+          cp tui-schema.json gh-pages-wo/tui.json
+          cp packages/sdk/openapi.json gh-pages-wo/openapi.json
+          cd gh-pages-wo
+          git add install install.ps1 config.json tui.json openapi.json
+          if ! git diff --cached --quiet; then
+            git commit -m "gh-pages: sync resources from main"
+            git push origin gh-pages
+          fi
+          cd ..
+          git worktree remove gh-pages-wo

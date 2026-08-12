@@ -1,0 +1,82 @@
+name: release
+
+# Builds the ustcode CLI for all 6 platforms and publishes the binaries as a GitHub
+# Release (with release notes), using the archives produced by
+# packages/ustcode/script/build.ts (dist/ustcode-<os>-<arch>.tar.gz|.zip).
+#
+# Trigger paths:
+#   - push a `vX.Y.Z` tag  -> the canonical release flow (version comes from the tag)
+#   - workflow_dispatch    -> manual run, optionally with an explicit `version` input
+#
+# NOTE: npm publishing (script/publish.ts) and the Homebrew tap update are intentionally
+# NOT wired up here yet. They can be added as follow-up jobs once the GitHub Release flow
+# is confirmed.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.19.0). Leave empty to derive from the v* tag."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-bun
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "enthusjast@outlook.com"
+          git config --global user.name "Enthusjast"
+
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "Unable to resolve a semver version. Set the 'version' input or push a v* tag." >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build binaries
+        working-directory: packages/ustcode
+        env:
+          USTCODE_CHANNEL: latest
+          USTCODE_VERSION: ${{ steps.version.outputs.version }}
+          USTCODE_RELEASE: "1"
+        run: bun run script/build.ts
+
+      - name: Smoke test built binary
+        run: ./packages/ustcode/dist/@enthusjast/ustcode-linux-x64/bin/ustcode --version
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            packages/ustcode/dist/ustcode-linux-x64.tar.gz \
+            packages/ustcode/dist/ustcode-linux-arm64.tar.gz \
+            packages/ustcode/dist/ustcode-darwin-x64.zip \
+            packages/ustcode/dist/ustcode-darwin-arm64.zip \
+            packages/ustcode/dist/ustcode-windows-x64.zip \
+            packages/ustcode/dist/ustcode-windows-arm64.zip \
+            --title "ustcode ${{ steps.version.outputs.version }}" \
+            --generate-notes
