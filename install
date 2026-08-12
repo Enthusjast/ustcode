@@ -392,6 +392,13 @@ if [[ "$no_modify_path" != "true" ]]; then
     fi
 fi
 
+# Also make ustcode available in the current session. Note: `curl ... | bash`
+# runs the installer in a subshell, so this export cannot propagate back to the
+# parent shell — users there must restart the terminal (or `source ~/.bashrc`).
+if [[ "$no_modify_path" != "true" ]] && [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    export PATH="$INSTALL_DIR:$PATH"
+fi
+
 if [ -n "${GITHUB_ACTIONS-}" ] && [ "${GITHUB_ACTIONS}" == "true" ]; then
     echo "$INSTALL_DIR" >> $GITHUB_PATH
     print_message info "Added $INSTALL_DIR to \$GITHUB_PATH"
@@ -408,6 +415,9 @@ echo -e "${MUTED}UstCode includes free models, to start:${NC}"
 echo -e ""
 echo -e "cd <project>  ${MUTED}# Open directory${NC}"
 echo -e "ustcode      ${MUTED}# Run command${NC}"
+echo -e ""
+echo -e "${ORANGE}NOTE: If 'ustcode' is not found, restart your terminal or run${NC}"
+echo -e "${ORANGE}      'source ~/.bashrc' to reload your PATH.${NC}"
 echo -e ""
 echo -e "${MUTED}For more information visit ${NC}https://github.com/Enthusjast/ustcode"
 echo -e ""
