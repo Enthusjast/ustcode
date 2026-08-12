@@ -10,6 +10,8 @@ on:
     paths:
       - "install"
       - "install.ps1"
+      - "uninstall"
+      - "uninstall.ps1"
       - "config-schema.json"
       - "tui-schema.json"
       - "packages/sdk/openapi.json"
@@ -43,11 +45,13 @@ jobs:
           git worktree add gh-pages-wo gh-pages
           cp install gh-pages-wo/install
           cp install.ps1 gh-pages-wo/install.ps1
+          cp uninstall gh-pages-wo/uninstall
+          cp uninstall.ps1 gh-pages-wo/uninstall.ps1
           cp config-schema.json gh-pages-wo/config.json
           cp tui-schema.json gh-pages-wo/tui.json
           cp packages/sdk/openapi.json gh-pages-wo/openapi.json
           cd gh-pages-wo
-          git add install install.ps1 config.json tui.json openapi.json
+          git add install install.ps1 uninstall uninstall.ps1 config.json tui.json openapi.json
           if ! git diff --cached --quiet; then
             git commit -m "gh-pages: sync resources from main"
             git push origin gh-pages

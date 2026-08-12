@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP=ustcode
+INSTALL_DIR="$HOME/.ustcode/bin"
+
+MUTED='\033[0;2m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+ORANGE='\033[38;5;214m'
+NC='\033[0m' # No Color
+
+print_message() {
+    local color=$1
+    local message=$2
+    echo -e "${color}${message}${NC}"
+}
+
+usage() {
+    cat <<EOF
+UstCode Uninstaller
+
+Removes the ustcode binary and its PATH entries from your shell config.
+
+Usage: uninstall [options]
+
+Options:
+    -h, --help      Display this help message
+    --purge         Also remove user data and config (logs, sessions, settings)
+
+EOF
+}
+
+purge_data=false
+for arg in "$@"; do
+    case $arg in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --purge)
+            purge_data=true
+            ;;
+        *)
+            echo "Unknown option: $arg" >&2
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+# Remove the installed binary directory.
+if [ -d "$HOME/.ustcode" ]; then
+    rm -rf "$HOME/.ustcode"
+    print_message "$GREEN" "Removed $HOME/.ustcode"
+else
+    print_message "$MUTED" "No installation found at $HOME/.ustcode"
+fi
+
+# Remove PATH entries from shell config files. The installer appends a
+# "# ustcode" marker line and an `export PATH=...` / `fish_add_path ...` line;
+# filter both out of any config file that contains them.
+clean_config() {
+    local file=$1
+    if [ ! -f "$file" ]; then return; fi
+    local tmp
+    tmp="$(mktemp)"
+    # Match the "# ustcode" marker and any line referencing the install dir
+    # (the installer writes the expanded path, but match ".ustcode" to be safe).
+    grep -v -e "^# ustcode$" -e "\.ustcode" "$file" > "$tmp" || true
+    if ! cmp -s "$file" "$tmp"; then
+        mv "$tmp" "$file"
+        print_message "$GREEN" "Removed ustcode from $file"
+    else
+        rm -f "$tmp"
+    fi
+}
+
+XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+
+# Clean every common shell config, not just the current shell's — the PATH
+# entry may have been added under a different shell than the one in use now.
+config_files="$HOME/.bashrc $HOME/.bash_profile $HOME/.profile \
+$HOME/.zshrc $HOME/.zshenv $HOME/.config/fish/config.fish \
+$HOME/.ashrc /etc/profile \
+$XDG_CONFIG_HOME/bash/.bashrc $XDG_CONFIG_HOME/bash/.bash_profile \
+$XDG_CONFIG_HOME/zsh/.zshrc $XDG_CONFIG_HOME/zsh/.zshenv"
+
+for file in $config_files; do
+    clean_config "$file"
+done
+
+if [ "$purge_data" = true ]; then
+    for dir in "$HOME/.local/share/ustcode" "$HOME/.local/state/ustcode" "$HOME/.config/ustcode"; do
+        if [ -e "$dir" ]; then
+            rm -rf "$dir"
+            print_message "$GREEN" "Removed $dir"
+        fi
+    done
+    print_message "$ORANGE" "User data and config removed."
+else
+    print_message "$MUTED" "Tip: run 'uninstall --purge' to also remove user data and config."
+fi
+
+echo -e ""
+print_message "$GREEN" "ustcode has been uninstalled."
+echo -e ""
+print_message "$MUTED" "If 'ustcode' is still found, restart your terminal or run 'hash -r'."

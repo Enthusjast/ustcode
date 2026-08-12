@@ -33,6 +33,24 @@ curl -fsSL https://ustcode.enthusjast.cc/install | bash -s -- --binary /path/to/
 curl -fsSL https://ustcode.enthusjast.cc/install | bash -s -- --no-modify-path
 ```
 
+#### 卸载
+
+```bash
+# 下载并运行卸载脚本（移除二进制和 PATH 配置）
+curl -fsSL https://ustcode.enthusjast.cc/uninstall | bash
+
+# 连同用户数据（日志、会话、配置）一起删除
+curl -fsSL https://ustcode.enthusjast.cc/uninstall | bash -s -- --purge
+```
+
+**Windows**（PowerShell）：
+
+```powershell
+irm https://ustcode.enthusjast.cc/uninstall.ps1 | iex
+# 连同用户数据一起删除
+irm https://ustcode.enthusjast.cc/uninstall.ps1 | iex -ArgumentList "-Purge"
+```
+
 ### Agents
 
 UstCode 内置两种 Agent，可用 `Tab` 键快速切换：
