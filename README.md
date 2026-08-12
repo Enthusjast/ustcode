@@ -1,15 +1,6 @@
-<p align="center">
-  <a href="https://ustcode.enthusjast.cc">
-    <picture>
-      <source srcset="packages/identity/mark-light.svg" media="(prefers-color-scheme: dark)">
-      <img src="packages/identity/mark.svg" alt="UstCode logo">
-    </picture>
-  </a>
-</p>
-<p align="center">开源的 AI Coding Agent。</p>
+# ustcode
 
-[![UstCode Terminal UI](screenshot-uk.png)](https://ustcode.enthusjast.cc)
-
+USTC Coding Agent
 ---
 
 ### 安装
