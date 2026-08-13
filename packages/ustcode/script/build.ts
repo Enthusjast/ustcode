@@ -113,11 +113,7 @@ for (const item of targets) {
     files: {
       [treeSitterWorkerPath]: treeSitterWorker,
     },
-    entrypoints: [
-      "./src/index.ts",
-      workerPath,
-      treeSitterWorkerPath,
-    ],
+    entrypoints: ["./src/index.ts", workerPath, treeSitterWorkerPath],
     define: {
       FFF_LIBC: JSON.stringify("gnu"),
       USTCODE_VERSION: `'${Script.version}'`,

@@ -6,7 +6,9 @@ export type { IntegrationDraft, IntegrationMethodRegistration }
 
 export interface IntegrationHooks extends Hooks<{ transform: IntegrationDraft }> {
   readonly connection: {
-    readonly active: (integrationID: string) => Promise<import("@enthusjast/ustcode-sdk/v2/types").ConnectionInfo | undefined>
+    readonly active: (
+      integrationID: string,
+    ) => Promise<import("@enthusjast/ustcode-sdk/v2/types").ConnectionInfo | undefined>
     readonly resolve: (
       connection: import("@enthusjast/ustcode-sdk/v2/types").ConnectionInfo,
     ) => Promise<CredentialValue | undefined>

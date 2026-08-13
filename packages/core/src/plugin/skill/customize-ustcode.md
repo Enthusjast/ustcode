@@ -37,17 +37,17 @@ already-loaded config until then.
 
 ## Where files live
 
-| Scope                         | Path                                                                                                                      |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Scope                         | Path                                                                                                                 |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Project config                | `./ustcode.json`, `./ustcode.jsonc`, or `.ustcode/ustcode.json` (ustcode walks up from the cwd to the worktree root) |
-| Global config                 | `~/.config/ustcode/ustcode.json` (NOT `~/.ustcode/`)                                                                   |
-| Project agents                | `.ustcode/agent/<name>.md` or `.ustcode/agents/<name>.md`                                                               |
-| Global agents                 | `~/.config/ustcode/agent(s)/<name>.md`                                                                                   |
-| Project commands              | `.ustcode/command/<name>.md` or `.ustcode/commands/<name>.md`                                                           |
-| Global commands               | `~/.config/ustcode/command(s)/<name>.md`                                                                                 |
-| Project skills                | `.ustcode/skill(s)/<name>/SKILL.md`                                                                                      |
-| Global skills                 | `~/.config/ustcode/skill(s)/<name>/SKILL.md`                                                                             |
-| External skills (auto-loaded) | `~/.claude/skills/<name>/SKILL.md`, `~/.agents/skills/<name>/SKILL.md`                                                    |
+| Global config                 | `~/.config/ustcode/ustcode.json` (NOT `~/.ustcode/`)                                                                 |
+| Project agents                | `.ustcode/agent/<name>.md` or `.ustcode/agents/<name>.md`                                                            |
+| Global agents                 | `~/.config/ustcode/agent(s)/<name>.md`                                                                               |
+| Project commands              | `.ustcode/command/<name>.md` or `.ustcode/commands/<name>.md`                                                        |
+| Global commands               | `~/.config/ustcode/command(s)/<name>.md`                                                                             |
+| Project skills                | `.ustcode/skill(s)/<name>/SKILL.md`                                                                                  |
+| Global skills                 | `~/.config/ustcode/skill(s)/<name>/SKILL.md`                                                                         |
+| External skills (auto-loaded) | `~/.claude/skills/<name>/SKILL.md`, `~/.agents/skills/<name>/SKILL.md`                                               |
 
 Configs from each scope are deep-merged. Project overrides global. Unknown
 top-level keys in `ustcode.json` are rejected with `ConfigInvalidError`.

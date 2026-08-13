@@ -1442,15 +1442,17 @@ test("public provider info omits invalid models", () => {
   expect(result.models.invalid).toBeUndefined()
 })
 
-it.instance("model variants are generated for reasoning models", () =>
-  Effect.gen(function* () {
-    const providers = yield* list
-    // Reasoning models should get generated reasoning-effort variants
-    const model = providers[ProviderV2.ID.make("test-provider")].models["reasoning-model"]
-    expect(model.capabilities.reasoning).toBe(true)
-    expect(model.variants).toBeDefined()
-    expect(Object.keys(model.variants!).length).toBeGreaterThan(0)
-  }),
+it.instance(
+  "model variants are generated for reasoning models",
+  () =>
+    Effect.gen(function* () {
+      const providers = yield* list
+      // Reasoning models should get generated reasoning-effort variants
+      const model = providers[ProviderV2.ID.make("test-provider")].models["reasoning-model"]
+      expect(model.capabilities.reasoning).toBe(true)
+      expect(model.variants).toBeDefined()
+      expect(Object.keys(model.variants!).length).toBeGreaterThan(0)
+    }),
   {
     config: {
       provider: {
@@ -1868,4 +1870,3 @@ it.instance(
     expect(providers[ProviderV2.ID.make("openai")]).toBeUndefined()
   }),
 )
-

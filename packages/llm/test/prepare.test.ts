@@ -155,5 +155,4 @@ describe("request option precedence", () => {
       })
     }),
   )
-
 })

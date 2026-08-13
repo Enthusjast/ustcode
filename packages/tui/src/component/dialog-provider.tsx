@@ -136,7 +136,6 @@ export function createDialogProviderOptions() {
           category: provider.category,
           gutter: connected && onboarded() ? () => <text fg={theme.success}>✓</text> : undefined,
           async onSelect() {
-
             const methods = sync.data.provider_auth[providerID] ?? [
               {
                 type: "api",
@@ -370,9 +369,7 @@ function ApiMethod(props: ApiMethodProps) {
         ({
           USTC: (
             <box gap={1}>
-              <text fg={theme.textMuted}>
-                USTC provides coding models through an OpenAI-compatible API.
-              </text>
+              <text fg={theme.textMuted}>USTC provides coding models through an OpenAI-compatible API.</text>
               <text fg={theme.text}>
                 Set <span style={{ fg: theme.primary }}>USTC_API_KEY</span> or paste an API key to connect.
               </text>

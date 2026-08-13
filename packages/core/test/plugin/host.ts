@@ -5,7 +5,11 @@ import { Credential } from "@enthusjast/ustcode-core/credential"
 import { Integration } from "@enthusjast/ustcode-core/integration"
 import { ModelV2 } from "@enthusjast/ustcode-core/model"
 import { ProviderV2 } from "@enthusjast/ustcode-core/provider"
-import type { IntegrationEnvMethod, IntegrationKeyMethod, IntegrationOAuthMethod } from "@enthusjast/ustcode-sdk/v2/types"
+import type {
+  IntegrationEnvMethod,
+  IntegrationKeyMethod,
+  IntegrationOAuthMethod,
+} from "@enthusjast/ustcode-sdk/v2/types"
 import { Effect } from "effect"
 
 type Overrides = Partial<Omit<PluginContext, "options">>

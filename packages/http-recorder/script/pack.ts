@@ -14,7 +14,9 @@ export const pack = async () => {
     readonly version: string
     exports: Record<string, string | { readonly import: string; readonly types: string }>
   }
-  const archive = fileURLToPath(new URL(`../${pkg.name.replace(/^@/, "").replace("/", "-")}-${pkg.version}.tgz`, import.meta.url))
+  const archive = fileURLToPath(
+    new URL(`../${pkg.name.replace(/^@/, "").replace("/", "-")}-${pkg.version}.tgz`, import.meta.url),
+  )
 
   for (const [key, value] of Object.entries(pkg.exports)) {
     if (key === "./internal") {

@@ -144,10 +144,7 @@ function normalizeMessages(
     })
   }
 
-  if (
-    typeof model.capabilities.interleaved === "object" &&
-    model.capabilities.interleaved.field
-  ) {
+  if (typeof model.capabilities.interleaved === "object" && model.capabilities.interleaved.field) {
     const field = model.capabilities.interleaved.field
     return msgs.map((msg) => {
       if (msg.role === "assistant" && Array.isArray(msg.content)) {
@@ -477,10 +474,7 @@ export function variants(model: Provider.Model): Record<string, Record<string, a
   const glm52 = ["glm-5.2", "glm-5-2", "glm-5p2"].some(
     (name) => id.includes(name) || model.api.id.toLowerCase().includes(name),
   )
-  if (
-    model.api.id.toLowerCase().includes("minimax-m3") &&
-    model.api.npm === "@ai-sdk/openai-compatible"
-  ) {
+  if (model.api.id.toLowerCase().includes("minimax-m3") && model.api.npm === "@ai-sdk/openai-compatible") {
     if (model.providerID === "lilac") {
       return {
         none: { chat_template_kwargs: { thinking_mode: "disabled" } },

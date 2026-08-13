@@ -6,12 +6,7 @@
   "$defs": {
     "LogLevel": {
       "type": "string",
-      "enum": [
-        "DEBUG",
-        "INFO",
-        "WARN",
-        "ERROR"
-      ],
+      "enum": ["DEBUG", "INFO", "WARN", "ERROR"],
       "description": "Log level"
     },
     "ServerConfig": {
@@ -120,9 +115,7 @@
           ]
         }
       },
-      "required": [
-        "repository"
-      ],
+      "required": ["repository"],
       "additionalProperties": false
     },
     "ConfigV2.Reference.Local": {
@@ -152,18 +145,12 @@
           ]
         }
       },
-      "required": [
-        "path"
-      ],
+      "required": ["path"],
       "additionalProperties": false
     },
     "PermissionActionConfig": {
       "type": "string",
-      "enum": [
-        "ask",
-        "allow",
-        "deny"
-      ]
+      "enum": ["ask", "allow", "deny"]
     },
     "PermissionObjectConfig": {
       "type": "object",
@@ -439,11 +426,7 @@
           "anyOf": [
             {
               "type": "string",
-              "enum": [
-                "subagent",
-                "primary",
-                "all"
-              ]
+              "enum": ["subagent", "primary", "all"]
             },
             {
               "type": "null"
@@ -485,15 +468,7 @@
                 },
                 {
                   "type": "string",
-                  "enum": [
-                    "primary",
-                    "secondary",
-                    "accent",
-                    "success",
-                    "warning",
-                    "error",
-                    "info"
-                  ]
+                  "enum": ["primary", "secondary", "accent", "success", "warning", "error", "info"]
                 }
               ]
             },
@@ -690,9 +665,7 @@
                         },
                         {
                           "type": "boolean",
-                          "enum": [
-                            false
-                          ]
+                          "enum": [false]
                         }
                       ],
                       "description": "Timeout in milliseconds for full requests to this provider. Set to false to disable timeout."
@@ -717,9 +690,7 @@
                         },
                         {
                           "type": "boolean",
-                          "enum": [
-                            false
-                          ]
+                          "enum": [false]
                         }
                       ],
                       "description": "Timeout in milliseconds to wait for response headers. Provider integrations may set defaults. Set to false to disable timeout."
@@ -851,11 +822,7 @@
                             "anyOf": [
                               {
                                 "type": "string",
-                                "enum": [
-                                  "reasoning",
-                                  "reasoning_content",
-                                  "reasoning_text"
-                                ]
+                                "enum": ["reasoning", "reasoning_content", "reasoning_text"]
                               },
                               {
                                 "type": "string"
@@ -869,11 +836,7 @@
                                 "anyOf": [
                                   {
                                     "type": "string",
-                                    "enum": [
-                                      "reasoning",
-                                      "reasoning_content",
-                                      "reasoning_text"
-                                    ]
+                                    "enum": ["reasoning", "reasoning_content", "reasoning_text"]
                                   },
                                   {
                                     "type": "string"
@@ -881,9 +844,7 @@
                                 ]
                               }
                             },
-                            "required": [
-                              "field"
-                            ],
+                            "required": ["field"],
                             "additionalProperties": false
                           }
                         ]
@@ -956,10 +917,7 @@
                                     ]
                                   }
                                 },
-                                "required": [
-                                  "input",
-                                  "output"
-                                ],
+                                "required": ["input", "output"],
                                 "additionalProperties": false
                               },
                               {
@@ -968,10 +926,7 @@
                             ]
                           }
                         },
-                        "required": [
-                          "input",
-                          "output"
-                        ],
+                        "required": ["input", "output"],
                         "additionalProperties": false
                       },
                       {
@@ -1001,10 +956,7 @@
                             "type": "number"
                           }
                         },
-                        "required": [
-                          "context",
-                          "output"
-                        ],
+                        "required": ["context", "output"],
                         "additionalProperties": false
                       },
                       {
@@ -1023,13 +975,7 @@
                                 "type": "array",
                                 "items": {
                                   "type": "string",
-                                  "enum": [
-                                    "text",
-                                    "audio",
-                                    "image",
-                                    "video",
-                                    "pdf"
-                                  ]
+                                  "enum": ["text", "audio", "image", "video", "pdf"]
                                 }
                               },
                               {
@@ -1043,13 +989,7 @@
                                 "type": "array",
                                 "items": {
                                   "type": "string",
-                                  "enum": [
-                                    "text",
-                                    "audio",
-                                    "image",
-                                    "video",
-                                    "pdf"
-                                  ]
+                                  "enum": ["text", "audio", "image", "video", "pdf"]
                                 }
                               },
                               {
@@ -1079,12 +1019,7 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "enum": [
-                          "alpha",
-                          "beta",
-                          "deprecated",
-                          "active"
-                        ]
+                        "enum": ["alpha", "beta", "deprecated", "active"]
                       },
                       {
                         "type": "null"
@@ -1191,9 +1126,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "local"
-          ],
+          "enum": ["local"],
           "description": "Type of MCP server connection"
         },
         "command": {
@@ -1256,10 +1189,7 @@
           "description": "Timeout in ms for MCP server requests. Defaults to 5000 (5 seconds) if not specified."
         }
       },
-      "required": [
-        "type",
-        "command"
-      ],
+      "required": ["type", "command"],
       "additionalProperties": false
     },
     "McpOAuthConfig": {
@@ -1334,9 +1264,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "remote"
-          ],
+          "enum": ["remote"],
           "description": "Type of MCP server connection"
         },
         "url": {
@@ -1377,9 +1305,7 @@
                 },
                 {
                   "type": "boolean",
-                  "enum": [
-                    false
-                  ]
+                  "enum": [false]
                 }
               ]
             },
@@ -1406,18 +1332,12 @@
           "description": "Timeout in ms for MCP server requests. Defaults to 5000 (5 seconds) if not specified."
         }
       },
-      "required": [
-        "type",
-        "url"
-      ],
+      "required": ["type", "url"],
       "additionalProperties": false
     },
     "LayoutConfig": {
       "type": "string",
-      "enum": [
-        "auto",
-        "stretch"
-      ]
+      "enum": ["auto", "stretch"]
     },
     "ImageAttachmentConfig": {
       "type": "object",
@@ -1503,10 +1423,7 @@
     },
     "Policy.Effect": {
       "type": "string",
-      "enum": [
-        "allow",
-        "deny"
-      ]
+      "enum": ["allow", "deny"]
     },
     "ConfigV2.Experimental.Policy": {
       "type": "object",
@@ -1517,9 +1434,7 @@
               "anyOf": [
                 {
                   "type": "string",
-                  "enum": [
-                    "provider.use"
-                  ]
+                  "enum": ["provider.use"]
                 }
               ]
             }
@@ -1532,11 +1447,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "action",
-        "effect",
-        "resource"
-      ],
+      "required": ["action", "effect", "resource"],
       "additionalProperties": false
     },
     "Config": {
@@ -1647,9 +1558,7 @@
                     ]
                   }
                 },
-                "required": [
-                  "template"
-                ],
+                "required": ["template"],
                 "additionalProperties": false
               }
             },
@@ -1825,9 +1734,7 @@
                 },
                 {
                   "type": "string",
-                  "enum": [
-                    "notify"
-                  ]
+                  "enum": ["notify"]
                 }
               ]
             },
@@ -2084,9 +1991,7 @@
                         "type": "boolean"
                       }
                     },
-                    "required": [
-                      "enabled"
-                    ],
+                    "required": ["enabled"],
                     "additionalProperties": false
                   }
                 ]
@@ -2187,14 +2092,10 @@
                         "properties": {
                           "disabled": {
                             "type": "boolean",
-                            "enum": [
-                              true
-                            ]
+                            "enum": [true]
                           }
                         },
-                        "required": [
-                          "disabled"
-                        ],
+                        "required": ["disabled"],
                         "additionalProperties": false
                       },
                       {
@@ -2253,9 +2154,7 @@
                             ]
                           }
                         },
-                        "required": [
-                          "command"
-                        ],
+                        "required": ["command"],
                         "additionalProperties": false
                       }
                     ]

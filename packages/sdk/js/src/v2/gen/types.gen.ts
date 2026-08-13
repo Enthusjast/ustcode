@@ -2001,9 +2001,6 @@ export type Config = {
     [key: string]: boolean
   }
   attachment?: AttachmentConfig
-  enterprise?: {
-    url?: string
-  }
   tool_output?: {
     max_lines?: number
     max_bytes?: number
@@ -2095,6 +2092,7 @@ export type Model = {
     output: number
   }
   status: "alpha" | "beta" | "deprecated" | "active"
+  default?: boolean
   options: {
     [key: string]: unknown
   }

@@ -320,9 +320,7 @@ describe("Config", () => {
                   sdk: { repository: "github.com/example/sdk", branch: "main" },
                   shorthand: "github.com/example/docs",
                 },
-                plugins: [
-                  { package: "@my-org/audit-plugin", options: { endpoint: "https://audit.example.com" } },
-                ],
+                plugins: [{ package: "@my-org/audit-plugin", options: { endpoint: "https://audit.example.com" } }],
               }),
             ),
           )
@@ -484,9 +482,7 @@ describe("Config", () => {
                     permission: { read: "allow" },
                   },
                 },
-                plugin: [
-                  ["@my-org/audit-plugin", { endpoint: "https://audit.example.com" }],
-                ],
+                plugin: [["@my-org/audit-plugin", { endpoint: "https://audit.example.com" }]],
                 skills: { paths: ["./skills"], urls: ["https://example.com/.well-known/skills/"] },
                 references: {
                   docs: { path: "../docs", description: "Use for product documentation", hidden: true },

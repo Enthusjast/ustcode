@@ -21074,15 +21074,6 @@
           "attachment": {
             "$ref": "#/components/schemas/AttachmentConfig"
           },
-          "enterprise": {
-            "type": "object",
-            "properties": {
-              "url": {
-                "type": "string"
-              }
-            },
-            "additionalProperties": false
-          },
           "tool_output": {
             "type": "object",
             "properties": {
@@ -21391,6 +21382,9 @@
           "status": {
             "type": "string",
             "enum": ["alpha", "beta", "deprecated", "active"]
+          },
+          "default": {
+            "type": "boolean"
           },
           "options": {
             "type": "object"

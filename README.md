@@ -84,24 +84,24 @@ ustcode --model USTC/qwen-chat
 
 内置的模型 (来自 USTC 词元计划)
 
-| 模型 ID | 说明 |
-| --- | --- |
-| `USTC/deepseek-v4-pro` | DeepSeek V4 Pro（推理） |
-| `USTC/deepseek-v4-flash` | DeepSeek V4 Flash（推理） |
-| `USTC/deepseek-v4-flash-ascend` | DeepSeek V4 Flash Ascend（推理） |
+| 模型 ID                          | 说明                               |
+| -------------------------------- | ---------------------------------- |
+| `USTC/deepseek-v4-pro`           | DeepSeek V4 Pro（推理）            |
+| `USTC/deepseek-v4-flash`         | DeepSeek V4 Flash（推理）          |
+| `USTC/deepseek-v4-flash-ascend`  | DeepSeek V4 Flash Ascend（推理）   |
 | `USTC/deepseek-v4-flash-ascend1` | DeepSeek V4 Flash Ascend 1（推理） |
-| `USTC/glm-5.2` | GLM 5.2 |
-| `USTC/glm-5.2-107` | GLM 5.2 (107) |
-| `USTC/k3` | K3 |
-| `USTC/qwen3.6-chat` | Qwen 3.6 Chat |
-| `USTC/qwen3.6-reasoner` | Qwen 3.6 Reasoner（推理） |
-| `USTC/qwen-chat` | Qwen Chat |
-| `USTC/qwen-reasoner` | Qwen Reasoner（推理） |
-| `USTC/qwen3-embedding` | Qwen3 Embedding（向量嵌入） |
-| `USTC/qwen3-reranker` | Qwen3 Reranker（重排序） |
-| `USTC/smart/reasoning` | Smart Reasoning（推理） |
-| `USTC/smart/default` | Smart Default |
-| `USTC/unlimited-ocr` | OCR（支持图像输入） |
+| `USTC/glm-5.2`                   | GLM 5.2                            |
+| `USTC/glm-5.2-107`               | GLM 5.2 (107)                      |
+| `USTC/k3`                        | K3                                 |
+| `USTC/qwen3.6-chat`              | Qwen 3.6 Chat                      |
+| `USTC/qwen3.6-reasoner`          | Qwen 3.6 Reasoner（推理）          |
+| `USTC/qwen-chat`                 | Qwen Chat                          |
+| `USTC/qwen-reasoner`             | Qwen Reasoner（推理）              |
+| `USTC/qwen3-embedding`           | Qwen3 Embedding（向量嵌入）        |
+| `USTC/qwen3-reranker`            | Qwen3 Reranker（重排序）           |
+| `USTC/smart/reasoning`           | Smart Reasoning（推理）            |
+| `USTC/smart/default`             | Smart Default                      |
+| `USTC/unlimited-ocr`             | OCR（支持图像输入）                |
 
 ### 3. 其他供应商
 
@@ -116,10 +116,10 @@ UstCode 采用配置驱动，不依赖 models.dev。如需使用其他 OpenAI �
       "npm": "@ai-sdk/openai-compatible",
       "env": ["MY_PROVIDER_API_KEY"],
       "models": {
-        "my-model": { "name": "My Model", "limit": { "context": 128000 } }
-      }
-    }
-  }
+        "my-model": { "name": "My Model", "limit": { "context": 128000 } },
+      },
+    },
+  },
 }
 ```
 

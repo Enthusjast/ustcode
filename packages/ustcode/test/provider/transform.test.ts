@@ -74,8 +74,6 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBeUndefined()
   })
 
-
-
   test("should not set promptCacheKey for the OpenAI-compatible SDK by provider name", () => {
     const result = ProviderTransform.options({
       model: {
@@ -107,7 +105,6 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBeUndefined()
   })
 
-
   test("should not set promptCacheKey for the xAI SDK when explicitly disabled", () => {
     const xaiModel = {
       ...mockModel,
@@ -125,14 +122,6 @@ describe("ProviderTransform.options - setCacheKey", () => {
     })
     expect(result.promptCacheKey).toBeUndefined()
   })
-
-
-
-
-
-
-
-
 
   test("should not send an undocumented OpenRouter prompt_cache_key", () => {
     const result = ProviderTransform.options({
@@ -199,10 +188,6 @@ describe("ProviderTransform.options - zai/zhipuai thinking", () => {
     })
   }
 })
-
-
-
-
 
 describe("ProviderTransform.options - gateway", () => {
   const sessionID = "test-session-123"
@@ -288,14 +273,6 @@ describe("ProviderTransform.providerOptions", () => {
       ...overrides,
     }) as any
 
-
-
-
-
-
-
-
-
   test("uses gateway model provider slug for gateway models", () => {
     const model = createModel({
       providerID: "vercel",
@@ -378,7 +355,6 @@ describe("ProviderTransform.providerOptions", () => {
       bedrock: { reasoningConfig: { type: "enabled" } },
     })
   })
-
 
   test("uses groq slug for groq models", () => {
     const model = createModel({
@@ -830,7 +806,6 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
   })
 })
 
-
 describe("ProviderTransform.schema - moonshot $ref siblings", () => {
   const moonshotModel = {
     providerID: "moonshotai",
@@ -974,7 +949,6 @@ describe("ProviderTransform.schema - moonshot $ref siblings", () => {
     })
   })
 })
-
 
 describe("ProviderTransform.message - DeepSeek reasoning content", () => {
   test("DeepSeek with tool calls includes reasoning_content in providerOptions", () => {
@@ -1244,15 +1218,7 @@ describe("ProviderTransform.message - empty image handling", () => {
     options: {},
     headers: {},
   } as any
-
-
-
 })
-
-
-
-
-
 
 describe("ProviderTransform.message - cache control on gateway", () => {
   const createModel = (overrides: Partial<any> = {}) =>
@@ -1300,12 +1266,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
     expect(result[0].content).toBe("You are a helpful assistant")
     expect(result[0].providerOptions).toBeUndefined()
   })
-
-
-
 })
-
-
 
 describe("ProviderTransform sampling defaults - DeepSeek", () => {
   const model = (providerID: string, id: string) =>
@@ -1335,7 +1296,6 @@ describe("ProviderTransform sampling defaults - DeepSeek", () => {
     expect(ProviderTransform.topK(model(providerID, id))).toBeUndefined()
   })
 })
-
 
 describe("ProviderTransform.variants", () => {
   const createMockModel = (overrides: Partial<any> = {}): any => ({
@@ -1531,7 +1491,6 @@ describe("ProviderTransform.variants", () => {
     const result = ProviderTransform.variants(model)
     expect(result).toEqual({})
   })
-
 
   describe("@ai-sdk/gateway", () => {
     test("configured anthropic aliases route by the API ID", () => {
@@ -1803,11 +1762,6 @@ describe("ProviderTransform.variants", () => {
     }
   })
 
-
-
-
-
-
   describe("@ai-sdk/openai-compatible", () => {
     test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
       const model = createMockModel({
@@ -1842,20 +1796,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
   })
-
-
-
-
-
-
-
-
-
-
-
-
 })
-
 
 test("ProviderTransform.smallOptions preserves the weakest OpenRouter reasoning effort", () => {
   expect(
@@ -1873,6 +1814,3 @@ test("ProviderTransform.smallOptions preserves the weakest OpenRouter reasoning 
     } as any),
   ).toEqual({ reasoning: { effort: "low" } })
 })
-
-
-

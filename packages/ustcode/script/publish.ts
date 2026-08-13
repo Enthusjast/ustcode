@@ -79,7 +79,6 @@ const tasks = Object.entries(binaries).map(async ([name]) => {
 await Promise.all(tasks)
 await publish(`./dist/${pkg.name}`, pkg.name, version)
 
-
 async function sha256Hex(path: string): Promise<string> {
   // sha256sum is GNU coreutils (absent by default on macOS); shasum ships with
   // macOS's Perl and is usually present on Linux too.

@@ -90,7 +90,6 @@ describe("session.llm-native.request", () => {
     ).toThrow("Native LLM request adapter does not support provider package unknown-provider")
   })
 
-
   test("prefers console provider api key over stored ustcode auth", () => {
     expect(
       LLMNativeRuntime.status({
@@ -159,5 +158,4 @@ describe("session.llm-native.request", () => {
       expect(failure.message).toContain("incomplete")
     }),
   )
-
 })

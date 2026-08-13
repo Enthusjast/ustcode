@@ -46,10 +46,10 @@ Authorization: Bearer sk-xxxx
 
 本站区分两种角色,能调用的接口范围不同:
 
-| 角色 | 说明 | 典型能力 |
-|---|---|---|
-| `internal_user` | 普通用户(如学生科研账号) | 查自己的 key/用量/花费明细 |
-| `proxy_admin` | 管理员 | 额外可查全局报表、管理所有 key/用户/团队 |
+| 角色            | 说明                     | 典型能力                                 |
+| --------------- | ------------------------ | ---------------------------------------- |
+| `internal_user` | 普通用户(如学生科研账号) | 查自己的 key/用量/花费明细               |
+| `proxy_admin`   | 管理员                   | 额外可查全局报表、管理所有 key/用户/团队 |
 
 > 本文档实测所用账号角色为 `internal_user`(访问组 `student-research`)。标注"管理员专属"的接口,普通用户调用会返回 `401`。
 
@@ -84,25 +84,25 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
 
 ## 3. 接口总览
 
-| 接口 | 方法 | 权限 | 作用 |
-|---|---|---|---|
-| `/key/info` | GET | 普通用户 | **查单个 key 的预算 / 已花 / 余量** ⭐ 最常用 |
-| `/user/info` | GET | 普通用户 | 查用户级累计花费 + 名下所有 key |
-| `/key/list` | GET | 普通用户 | 列出可见 key 的哈希列表 |
-| `/spend/logs` | GET | 普通用户 | 逐条花费明细(每次调用的 model / tokens / 花费 / 耗时) |
-| `/spend/logs/v2` | GET | 普通用户 | 花费明细 v2(支持更多过滤、分页) |
-| `/user/daily/activity` | GET | 普通用户 | 每日用量(逐日) |
-| `/user/daily/activity/aggregated` | GET | **管理员专属** | 每日用量(聚合,普通用户 401) |
-| `/global/spend/report` | GET | **管理员专属** | 全局花费报表 |
-| `/spend/tags` | GET | 管理员专属 | 按标签查看花费 |
-| `/global/spend/tags` | GET | 管理员专属 | 全局按标签花费 |
-| `/global/spend/reset` | POST | **管理员专属** | 重置全局花费 |
-| `/provider/budgets` | GET | 管理员专属 | 各 provider 预算 |
-| `/key/generate` `/key/update` `/key/delete` 等 | POST | **管理员专属** | 创建 / 修改 / 删除 key |
-| `/team/*` | GET/POST | 视情况 | 团队维度用量与管理 |
-| `/health` | GET | 公开/任意 | 代理健康检查 |
-| `/v1/models` | GET | 普通用户 | 可用模型列表 |
-| `/key/health` | POST | 普通用户 | key 健康检查 |
+| 接口                                           | 方法     | 权限           | 作用                                                  |
+| ---------------------------------------------- | -------- | -------------- | ----------------------------------------------------- |
+| `/key/info`                                    | GET      | 普通用户       | **查单个 key 的预算 / 已花 / 余量** ⭐ 最常用         |
+| `/user/info`                                   | GET      | 普通用户       | 查用户级累计花费 + 名下所有 key                       |
+| `/key/list`                                    | GET      | 普通用户       | 列出可见 key 的哈希列表                               |
+| `/spend/logs`                                  | GET      | 普通用户       | 逐条花费明细(每次调用的 model / tokens / 花费 / 耗时) |
+| `/spend/logs/v2`                               | GET      | 普通用户       | 花费明细 v2(支持更多过滤、分页)                       |
+| `/user/daily/activity`                         | GET      | 普通用户       | 每日用量(逐日)                                        |
+| `/user/daily/activity/aggregated`              | GET      | **管理员专属** | 每日用量(聚合,普通用户 401)                           |
+| `/global/spend/report`                         | GET      | **管理员专属** | 全局花费报表                                          |
+| `/spend/tags`                                  | GET      | 管理员专属     | 按标签查看花费                                        |
+| `/global/spend/tags`                           | GET      | 管理员专属     | 全局按标签花费                                        |
+| `/global/spend/reset`                          | POST     | **管理员专属** | 重置全局花费                                          |
+| `/provider/budgets`                            | GET      | 管理员专属     | 各 provider 预算                                      |
+| `/key/generate` `/key/update` `/key/delete` 等 | POST     | **管理员专属** | 创建 / 修改 / 删除 key                                |
+| `/team/*`                                      | GET/POST | 视情况         | 团队维度用量与管理                                    |
+| `/health`                                      | GET      | 公开/任意      | 代理健康检查                                          |
+| `/v1/models`                                   | GET      | 普通用户       | 可用模型列表                                          |
+| `/key/health`                                  | POST     | 普通用户       | key 健康检查                                          |
 
 > **普通用户实际能用的核心接口:** `/key/info`、`/user/info`、`/key/list`、`/spend/logs`、`/spend/logs/v2`、`/user/daily/activity`、`/user/daily/activity/aggregated`、`/v1/models`、`/health`。
 
@@ -126,15 +126,16 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
 
 含义(该 key 共三层预算):
 
-| 层级 | 窗口 | 上限 | 下次重置 |
-|---|---|---|---|
-| 顶层 | 24h 滚动 | **100 元** | 每 24 小时重置 |
-| 第 1 子限 | 3h | 30 元 | 每天 18:00 (北京时间) |
-| 第 2 子限 | 12h | 70 元 | 每天 24:00 (北京时间) |
+| 层级      | 窗口     | 上限       | 下次重置              |
+| --------- | -------- | ---------- | --------------------- |
+| 顶层      | 24h 滚动 | **100 元** | 每 24 小时重置        |
+| 第 1 子限 | 3h       | 30 元      | 每天 18:00 (北京时间) |
+| 第 2 子限 | 12h      | 70 元      | 每天 24:00 (北京时间) |
 
 **三层同时生效,任一层用尽即停**(实际可用额度 = 各层剩余的最小值)。`budget_limits` 里是 `reset_at` 的绝对时刻 + 窗口时长,需自行计算"该层还剩下多少"。
 
 **关键结论:**
+
 - **余量不是无限大的总量,而是当前滚动窗口内的剩余。** 预算到点自动重置。
 - 想判断"现在能不能继续用",看 `spend` 是否接近任一层的 `max_budget`,以及是否临近 `reset_at`。
 
@@ -143,6 +144,7 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
 ## 5. 各接口详细说明
 
 > 通用约定:
+>
 > - Base URL 为 `https://api.llm.ustc.edu.cn`
 > - 全部需请求头 `Authorization: Bearer sk-xxxx`
 > - 所有示例假定环境变量 `$KEY=sk-xxxx`
@@ -153,9 +155,9 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
 
 **请求参数:**
 
-| 参数 | 位置 | 必填 | 说明 |
-|---|---|---|---|
-| `key` | query | 否 | 要查询的 key。**不传时默认使用 Authorization 头里的 key 查询自身** |
+| 参数  | 位置  | 必填 | 说明                                                               |
+| ----- | ----- | ---- | ------------------------------------------------------------------ |
+| `key` | query | 否   | 要查询的 key。**不传时默认使用 Authorization 头里的 key 查询自身** |
 
 **实测返回结构(`200`):**
 
@@ -169,7 +171,7 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
     "max_budget": 100.0,
     "budget_duration": "24h",
     "budget_reset_at": "2026-08-11T16:00:00+00:00",
-    "budget_limits": [ { "reset_at": "...", "max_budget": 30.0, "budget_duration": "3h" } ],
+    "budget_limits": [{ "reset_at": "...", "max_budget": 30.0, "budget_duration": "3h" }],
     "expires": "2053-11-04T05:46:42.997000+00:00",
     "blocked": false,
     "rpm_limit": 20,
@@ -179,31 +181,35 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" \
     "team_id": "a9339839-...",
     "models": [],
     "metadata": { "access_groups": ["student-research"], "is_vip": false, "authorized_models": ["qwen-chat", "..."] },
-    "created_at": "...", "updated_at": "...", "last_active": "...",
+    "created_at": "...",
+    "updated_at": "...",
+    "last_active": "...",
     "created_by": "default_user_id",
-    "model_spend": {}, "model_max_budget": {},
-    "rotation_count": 0, "auto_rotate": false
+    "model_spend": {},
+    "model_max_budget": {},
+    "rotation_count": 0,
+    "auto_rotate": false
   }
 }
 ```
 
 **关键字段说明:**
 
-| 字段 | 类型 | 含义 |
-|---|---|---|
-| `spend` | float | 当前窗口内已花费(元) |
-| `max_budget` | float | 预算上限(元);`null` = 无上限 |
-| `budget_duration` | string | 预算窗口,如 `"24h"` |
-| `budget_reset_at` | datetime | 顶层预算下次重置时间(UTC) |
-| `budget_limits` | array | 子层预算列表(见 [第 4 节](#4-预算机制详解)) |
-| `expires` | datetime | key 有效期截止 |
-| `blocked` | bool | 是否被封禁 |
-| `rpm_limit` | int | 每分钟请求数上限 |
-| `tpm_limit` | int | 每分钟 token 数上限 |
-| `max_parallel_requests` | int | 最大并发请求数 |
-| `models` | array | key 可用的模型白名单(空数组 = 用 metadata 或全局配置) |
-| `user_id` / `team_id` | string | 归属用户 / 团队 |
-| `last_active` | datetime | 最近一次活跃时间 |
+| 字段                    | 类型     | 含义                                                  |
+| ----------------------- | -------- | ----------------------------------------------------- |
+| `spend`                 | float    | 当前窗口内已花费(元)                                  |
+| `max_budget`            | float    | 预算上限(元);`null` = 无上限                          |
+| `budget_duration`       | string   | 预算窗口,如 `"24h"`                                   |
+| `budget_reset_at`       | datetime | 顶层预算下次重置时间(UTC)                             |
+| `budget_limits`         | array    | 子层预算列表(见 [第 4 节](#4-预算机制详解))           |
+| `expires`               | datetime | key 有效期截止                                        |
+| `blocked`               | bool     | 是否被封禁                                            |
+| `rpm_limit`             | int      | 每分钟请求数上限                                      |
+| `tpm_limit`             | int      | 每分钟 token 数上限                                   |
+| `max_parallel_requests` | int      | 最大并发请求数                                        |
+| `models`                | array    | key 可用的模型白名单(空数组 = 用 metadata 或全局配置) |
+| `user_id` / `team_id`   | string   | 归属用户 / 团队                                       |
+| `last_active`           | datetime | 最近一次活跃时间                                      |
 
 **计算余量的命令:**
 
@@ -220,9 +226,9 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" -H "Authorization: Bearer $KEY" \
 
 **请求参数:**
 
-| 参数 | 位置 | 必填 | 说明 |
-|---|---|---|---|
-| `user_id` | query | 否 | 要查询的用户 ID。不传时默认查当前 key 关联用户 |
+| 参数      | 位置  | 必填 | 说明                                           |
+| --------- | ----- | ---- | ---------------------------------------------- |
+| `user_id` | query | 否   | 要查询的用户 ID。不传时默认查当前 key 关联用户 |
 
 **实测返回结构(`200`):**
 
@@ -261,12 +267,12 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" -H "Authorization: Bearer $KEY" \
 
 **关键字段说明:**
 
-| 字段 | 含义 |
-|---|---|
-| `user_info.spend` | **用户累计总花费**(历史累加,不随窗口重置)。本次实测为 **1170.20 元** |
-| `user_info.max_budget` | 用户级预算上限(`null` = 无用户级限制,通常由各 key 各自限) |
-| `user_info.user_role` | 角色(`internal_user` / `proxy_admin`) |
-| `keys[]` | 该用户名下的**所有 key 数组**,每个 key 含预算/花费/限流/有效期 |
+| 字段                   | 含义                                                                 |
+| ---------------------- | -------------------------------------------------------------------- |
+| `user_info.spend`      | **用户累计总花费**(历史累加,不随窗口重置)。本次实测为 **1170.20 元** |
+| `user_info.max_budget` | 用户级预算上限(`null` = 无用户级限制,通常由各 key 各自限)            |
+| `user_info.user_role`  | 角色(`internal_user` / `proxy_admin`)                                |
+| `keys[]`               | 该用户名下的**所有 key 数组**,每个 key 含预算/花费/限流/有效期       |
 
 > ⚠️ 注意区分:`/key/info` 里的 `spend` 是**当前窗口内**的花费;`/user/info` 里的 `user_info.spend` 是**历史累计**花费。前者用于判断当前余量,后者用于看总开销。
 >
@@ -280,22 +286,18 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" -H "Authorization: Bearer $KEY" \
 
 **请求参数(节选):**
 
-| 参数 | 说明 |
-|---|---|
-| `page` / `size` | 分页 |
-| `user_id` / `team_id` | 按归属过滤 |
-| `return_full_object` | 是否返回完整对象而非仅哈希 |
-| `sort_by` / `sort_order` | 排序 |
+| 参数                     | 说明                       |
+| ------------------------ | -------------------------- |
+| `page` / `size`          | 分页                       |
+| `user_id` / `team_id`    | 按归属过滤                 |
+| `return_full_object`     | 是否返回完整对象而非仅哈希 |
+| `sort_by` / `sort_order` | 排序                       |
 
 **实测返回(`200`):**
 
 ```json
 {
-  "keys": [
-    "cfad36cd...638ac",
-    "317b9804...fb210ba",
-    "4b7085e2...ccde2"
-  ],
+  "keys": ["cfad36cd...638ac", "317b9804...fb210ba", "4b7085e2...ccde2"],
   "total_count": 3,
   "current_page": 1,
   "total_pages": 1
@@ -314,13 +316,13 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" -H "Authorization: Bearer $KEY" \
 
 **请求参数:**
 
-| 参数 | 说明 |
-|---|---|
-| `api_key` | 按 key 过滤(传 key 明文或哈希) |
-| `user_id` | 按用户过滤 |
-| `request_id` | 按单次请求过滤 |
-| `start_date` / `end_date` | 时间范围(YYYY-MM-DD) |
-| `summarize` | 是否汇总 |
+| 参数                      | 说明                           |
+| ------------------------- | ------------------------------ |
+| `api_key`                 | 按 key 过滤(传 key 明文或哈希) |
+| `user_id`                 | 按用户过滤                     |
+| `request_id`              | 按单次请求过滤                 |
+| `start_date` / `end_date` | 时间范围(YYYY-MM-DD)           |
+| `summarize`               | 是否汇总                       |
 
 > ⚠️ **实测注意:`/spend/logs` 的 `page` / `size` 参数无效**,传了 `size=1` 仍返回全部记录(实测 2167 条)。要限制范围请用 `start_date`/`end_date` 过滤,或用 `/spend/logs/v2`(v2 分页有效)。
 
@@ -344,37 +346,41 @@ curl -s "https://api.llm.ustc.edu.cn/key/info" -H "Authorization: Bearer $KEY" \
   "custom_llm_provider": "openai",
   "api_base": "http://114.214.244.2:10024/qwen36/v1/",
   "user": "81ce6947-...",
-  "metadata": { "status": null, "max_retries": 2, "usage_object": { "total_tokens": 1626, "prompt_tokens": 1530, "completion_tokens": 96 } }
+  "metadata": {
+    "status": null,
+    "max_retries": 2,
+    "usage_object": { "total_tokens": 1626, "prompt_tokens": 1530, "completion_tokens": 96 }
+  }
 }
 ```
 
 **关键字段说明:**
 
-| 字段 | 含义 |
-|---|---|
-| `request_id` | 请求唯一 ID(`chatcmpl-...`) |
-| `spend` | 本次调用花费(元) |
-| `total_tokens` / `prompt_tokens` / `completion_tokens` | token 用量 |
-| `model_group` | 模型组名(如 `qwen3.6-chat`),**日常看这个** |
-| `model` | 底层具体模型(如 `openai/qwen36-27b`) |
-| `api_base` | 实际后端地址 |
-| `startTime` / `endTime` / `request_duration_ms` | 时间与耗时 |
-| `user` | 发起用户 ID |
+| 字段                                                   | 含义                                       |
+| ------------------------------------------------------ | ------------------------------------------ |
+| `request_id`                                           | 请求唯一 ID(`chatcmpl-...`)                |
+| `spend`                                                | 本次调用花费(元)                           |
+| `total_tokens` / `prompt_tokens` / `completion_tokens` | token 用量                                 |
+| `model_group`                                          | 模型组名(如 `qwen3.6-chat`),**日常看这个** |
+| `model`                                                | 底层具体模型(如 `openai/qwen36-27b`)       |
+| `api_base`                                             | 实际后端地址                               |
+| `startTime` / `endTime` / `request_duration_ms`        | 时间与耗时                                 |
+| `user`                                                 | 发起用户 ID                                |
 
 #### `/spend/logs/v2`
 
 同 `/spend/logs`,但**过滤/分页能力更强**(推荐用于批量查询):
 
-| 参数 | 说明 |
-|---|---|
-| `page` / `page_size` | 分页(推荐组合使用,避免一次拉全量) |
-| `api_key` / `user_id` / `request_id` / `team_id` | 归属过滤 |
-| `min_spend` / `max_spend` | 按花费区间过滤 |
-| `start_date` / `end_date` | 时间范围 |
-| `model` / `model_group` / `model_id` | 按模型过滤 |
-| `status_filter` / `error_code` / `error_message` | 按状态/错误过滤 |
-| `key_alias` / `end_user` | 按别名/端用户过滤 |
-| `sort_by` / `sort_order` | 排序 |
+| 参数                                             | 说明                              |
+| ------------------------------------------------ | --------------------------------- |
+| `page` / `page_size`                             | 分页(推荐组合使用,避免一次拉全量) |
+| `api_key` / `user_id` / `request_id` / `team_id` | 归属过滤                          |
+| `min_spend` / `max_spend`                        | 按花费区间过滤                    |
+| `start_date` / `end_date`                        | 时间范围                          |
+| `model` / `model_group` / `model_id`             | 按模型过滤                        |
+| `status_filter` / `error_code` / `error_message` | 按状态/错误过滤                   |
+| `key_alias` / `end_user`                         | 按别名/端用户过滤                 |
+| `sort_by` / `sort_order`                         | 排序                              |
 
 > ⚠️ **`/spend/logs/v2` 实测必须带 `start_date` 和 `end_date`**,否则返回 `400`:
 > `{"error": {"message": "Start date and end date are required", "type": "bad_request", "code": "400"}}`
@@ -396,15 +402,15 @@ curl -s "https://api.llm.ustc.edu.cn/spend/logs?api_key=$KEY&start_date=2026-08-
 
 **请求参数:**
 
-| 参数 | 必填 | 说明 |
-|---|---|---|
-| `start_date` | **是** | 起始日期 `YYYY-MM-DD`(不传会报错) |
-| `end_date` | **是** | 结束日期 `YYYY-MM-DD` |
-| `model` | 否 | 按模型过滤 |
-| `api_key` | 否 | 按 key 过滤 |
-| `user_id` | 否 | 按用户过滤 |
-| `page` / `page_size` | 否 | 分页 |
-| `timezone` | 否 | 时区 |
+| 参数                 | 必填   | 说明                              |
+| -------------------- | ------ | --------------------------------- |
+| `start_date`         | **是** | 起始日期 `YYYY-MM-DD`(不传会报错) |
+| `end_date`           | **是** | 结束日期 `YYYY-MM-DD`             |
+| `model`              | 否     | 按模型过滤                        |
+| `api_key`            | 否     | 按 key 过滤                       |
+| `user_id`            | 否     | 按用户过滤                        |
+| `page` / `page_size` | 否     | 分页                              |
+| `timezone`           | 否     | 时区                              |
 
 **实测返回(`200`,结构):**
 
@@ -441,15 +447,15 @@ curl -s "https://api.llm.ustc.edu.cn/spend/logs?api_key=$KEY&start_date=2026-08-
 
 **关键字段说明:**
 
-| 字段 | 含义 |
-|---|---|
-| `results[]` | 每天的记录数组,按 `date` 逐日排列 |
-| `date` | 日期(`YYYY-MM-DD`) |
-| `metrics.spend` | 该日花费(元) |
-| `metrics.prompt_tokens` / `completion_tokens` / `cache_read_input_tokens` / `cache_creation_input_tokens` / `total_tokens` | 各类 token 用量 |
-| `metrics.successful_requests` / `failed_requests` / `api_requests` | 成功 / 失败 / 总请求数 |
-| `breakdown.models` | 按底层模型细分(键为模型名),每个模型含自己的 `metrics` 和 `api_key_breakdown`(按 key 哈希细分) |
-| `breakdown.mcp_servers` | MCP 服务器维度(通常为空) |
+| 字段                                                                                                                       | 含义                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `results[]`                                                                                                                | 每天的记录数组,按 `date` 逐日排列                                                             |
+| `date`                                                                                                                     | 日期(`YYYY-MM-DD`)                                                                            |
+| `metrics.spend`                                                                                                            | 该日花费(元)                                                                                  |
+| `metrics.prompt_tokens` / `completion_tokens` / `cache_read_input_tokens` / `cache_creation_input_tokens` / `total_tokens` | 各类 token 用量                                                                               |
+| `metrics.successful_requests` / `failed_requests` / `api_requests`                                                         | 成功 / 失败 / 总请求数                                                                        |
+| `breakdown.models`                                                                                                         | 按底层模型细分(键为模型名),每个模型含自己的 `metrics` 和 `api_key_breakdown`(按 key 哈希细分) |
+| `breakdown.mcp_servers`                                                                                                    | MCP 服务器维度(通常为空)                                                                      |
 
 **示例:某段时间每日花费曲线**
 
@@ -471,11 +477,11 @@ curl -s "https://api.llm.ustc.edu.cn/user/daily/activity?start_date=2026-08-01&e
 
 **请求参数:**
 
-| 参数 | 说明 |
-|---|---|
-| `start_date` / `end_date` | 时间范围 |
-| `group_by` | 分组维度:`team` / `customer` / `api_key` |
-| `api_key` / `internal_user_id` / `team_id` / `customer_id` | 过滤 |
+| 参数                                                       | 说明                                     |
+| ---------------------------------------------------------- | ---------------------------------------- |
+| `start_date` / `end_date`                                  | 时间范围                                 |
+| `group_by`                                                 | 分组维度:`team` / `customer` / `api_key` |
+| `api_key` / `internal_user_id` / `team_id` / `customer_id` | 过滤                                     |
 
 **普通用户调用返回 `401`:**
 
@@ -496,12 +502,12 @@ curl -s "https://api.llm.ustc.edu.cn/user/daily/activity?start_date=2026-08-01&e
 
 ### 5.7 辅助接口
 
-| 接口 | 方法 | 说明 |
-|---|---|---|
-| `/health` | GET | 代理健康检查 |
-| `/health/liveliness` / `/health/readiness` | GET | 存活 / 就绪探针 |
-| `/v1/models` | GET | 当前可用模型列表(OpenAI 兼容格式,返回 `data[]` 数组,含 `id`) |
-| `/key/health` | POST | key 健康检查 |
+| 接口                                       | 方法 | 说明                                                         |
+| ------------------------------------------ | ---- | ------------------------------------------------------------ |
+| `/health`                                  | GET  | 代理健康检查                                                 |
+| `/health/liveliness` / `/health/readiness` | GET  | 存活 / 就绪探针                                              |
+| `/v1/models`                               | GET  | 当前可用模型列表(OpenAI 兼容格式,返回 `data[]` 数组,含 `id`) |
+| `/key/health`                              | POST | key 健康检查                                                 |
 
 `/v1/models` 示例:
 
@@ -514,19 +520,19 @@ curl -s "https://api.llm.ustc.edu.cn/v1/models" -H "Authorization: Bearer $KEY" 
 
 ## 6. 权限对照表
 
-| 操作 | `internal_user`(普通) | `proxy_admin`(管理员) |
-|---|---|---|
-| 查自己 key 的预算/余量 (`/key/info`) | ✅ | ✅ |
-| 查名下所有 key (`/user/info`, `/key/list`) | ✅ | ✅ |
-| 查自己 key 的花费明细 (`/spend/logs`, `/spend/logs/v2`) | ✅ | ✅ |
-| 查每日用量 (`/user/daily/activity`) | ✅ | ✅ |
-| 每日用量聚合 (`/user/daily/activity/aggregated`) | ❌ 401 | ✅ |
-| 查可用模型 (`/v1/models`) | ✅ | ✅ |
-| key 健康检查 (`/key/health`) | ✅ | ✅ |
-| 全局花费报表 (`/global/spend/report`) | ❌ 401 | ✅ |
-| 全局按标签/重置 (`/global/spend/tags`, `/global/spend/reset`) | ❌ 401 | ✅ |
-| 创建/删除/修改 key (`/key/generate`, `/key/update`, `/key/delete`) | ❌ 401 | ✅ |
-| 管理用户/团队 (`/user/new`, `/team/new`, `/team/member_add` 等) | ❌ 401 | ✅ |
+| 操作                                                               | `internal_user`(普通) | `proxy_admin`(管理员) |
+| ------------------------------------------------------------------ | --------------------- | --------------------- |
+| 查自己 key 的预算/余量 (`/key/info`)                               | ✅                    | ✅                    |
+| 查名下所有 key (`/user/info`, `/key/list`)                         | ✅                    | ✅                    |
+| 查自己 key 的花费明细 (`/spend/logs`, `/spend/logs/v2`)            | ✅                    | ✅                    |
+| 查每日用量 (`/user/daily/activity`)                                | ✅                    | ✅                    |
+| 每日用量聚合 (`/user/daily/activity/aggregated`)                   | ❌ 401                | ✅                    |
+| 查可用模型 (`/v1/models`)                                          | ✅                    | ✅                    |
+| key 健康检查 (`/key/health`)                                       | ✅                    | ✅                    |
+| 全局花费报表 (`/global/spend/report`)                              | ❌ 401                | ✅                    |
+| 全局按标签/重置 (`/global/spend/tags`, `/global/spend/reset`)      | ❌ 401                | ✅                    |
+| 创建/删除/修改 key (`/key/generate`, `/key/update`, `/key/delete`) | ❌ 401                | ✅                    |
+| 管理用户/团队 (`/user/new`, `/team/new`, `/team/member_add` 等)    | ❌ 401                | ✅                    |
 
 ---
 
@@ -554,14 +560,14 @@ USTC_KEY=sk-xxxx bash /tmp/ustc-usage-check.sh
 
 ## 9. 常见错误与排障
 
-| 现象 | 原因 | 解决 |
-|---|---|---|
-| `401` + `"Only proxy admin can be used..."` | 调用了管理员专属接口 | 换用普通接口,或联系管理员 |
-| `{"detail": {"error": "Please provide start_date and end_date"}}` | `/user/daily/activity` 缺日期 | 加 `start_date` / `end_date` 参数 |
-| `422 Validation Error` | 参数缺失或类型不对 | 核对 [openapi.json](https://api.llm.ustc.edu.cn/openapi.json) |
-| `429` | 超过 `rpm_limit`(20/min)或 `max_parallel_requests` | 放慢请求频率 |
-| `spend` 接近 `max_budget` 被拒 | 预算用尽 | 等 `budget_reset_at` 重置,或联系管理员加额度 |
-| 查不到某 key 信息 | key 哈希/别名不对,或不在可见范围 | 用 `/key/list` 先确认哈希 |
+| 现象                                                              | 原因                                               | 解决                                                          |
+| ----------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------- |
+| `401` + `"Only proxy admin can be used..."`                       | 调用了管理员专属接口                               | 换用普通接口,或联系管理员                                     |
+| `{"detail": {"error": "Please provide start_date and end_date"}}` | `/user/daily/activity` 缺日期                      | 加 `start_date` / `end_date` 参数                             |
+| `422 Validation Error`                                            | 参数缺失或类型不对                                 | 核对 [openapi.json](https://api.llm.ustc.edu.cn/openapi.json) |
+| `429`                                                             | 超过 `rpm_limit`(20/min)或 `max_parallel_requests` | 放慢请求频率                                                  |
+| `spend` 接近 `max_budget` 被拒                                    | 预算用尽                                           | 等 `budget_reset_at` 重置,或联系管理员加额度                  |
+| 查不到某 key 信息                                                 | key 哈希/别名不对,或不在可见范围                   | 用 `/key/list` 先确认哈希                                     |
 
 ---
 
@@ -634,10 +640,10 @@ USTC_KEY=sk-xxxx bash /tmp/ustc-usage-check.sh
 
 实测账号 `total_spend = 1272.88 元`(历史累计,含所有 key)。名下 **3 个 key**:
 
-| key | max_budget | spend | 说明 |
-|---|---|---|---|
-| `sk-...OOAQ`(本次文档用 key) | 100 (24h) | 0.0 | 当前余量 100 |
-| `sk-...S2nQ` | 100 (24h) | 0.0 | 另一 key |
+| key                                             | max_budget       | spend      | 说明                            |
+| ----------------------------------------------- | ---------------- | ---------- | ------------------------------- |
+| `sk-...OOAQ`(本次文档用 key)                    | 100 (24h)        | 0.0        | 当前余量 100                    |
+| `sk-...S2nQ`                                    | 100 (24h)        | 0.0        | 另一 key                        |
 | `sk-...`(alias `107杯算力与智能体开发大赛_...`) | **null(无预算)** | **992.82** | 大赛专用 key,无上限、已花近千元 |
 
 > 注意 `key_name` 字段返回的是脱敏形式(`sk-...OOAQ`),不是完整明文。`user_info.spend` 是累计值,会随使用不断增长(本次会话期间已从 1170 增至 1272)。

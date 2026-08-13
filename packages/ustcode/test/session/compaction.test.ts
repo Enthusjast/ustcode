@@ -1789,5 +1789,4 @@ describe("SessionNs.getUsage", () => {
 
     expect(result.cost).toBe(0.9 + 0.4)
   })
-
 })

@@ -154,7 +154,6 @@ it.live("OpenAI Codex headerTimeout default can be disabled by config", () =>
   }),
 )
 
-
 function providerConfig(url: string, options: Record<string, unknown> = {}) {
   const config = testProviderConfig(url)
   return {

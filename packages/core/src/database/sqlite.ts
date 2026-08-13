@@ -5,4 +5,6 @@ import type { drizzle } from "drizzle-orm/bun-sqlite"
 
 export type DrizzleClient = ReturnType<typeof drizzle>
 export class Native extends Context.Service<Native, unknown>()("@enthusjast/ustcode-core/database/SqliteNative") {}
-export class Drizzle extends Context.Service<Drizzle, DrizzleClient>()("@enthusjast/ustcode-core/database/SqliteDrizzle") {}
+export class Drizzle extends Context.Service<Drizzle, DrizzleClient>()(
+  "@enthusjast/ustcode-core/database/SqliteDrizzle",
+) {}

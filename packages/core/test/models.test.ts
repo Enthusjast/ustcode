@@ -88,18 +88,14 @@ describe("ModelsDev Service", () => {
   it.live("get() returns providers from disk when cache file exists", () =>
     Effect.gen(function* () {
       yield* writeCache(fixture)
-      const result = yield* provided(
-        ModelsDev.Service.use((s) => s.get()),
-      )
+      const result = yield* provided(ModelsDev.Service.use((s) => s.get()))
       expect(result).toEqual(fixture)
     }),
   )
 
   it.live("get() returns empty catalog when disk is empty and no bundled snapshot is injected", () =>
     Effect.gen(function* () {
-      const result = yield* provided(
-        ModelsDev.Service.use((s) => s.get()),
-      )
+      const result = yield* provided(ModelsDev.Service.use((s) => s.get()))
       expect(result).toEqual({})
     }),
   )
@@ -107,13 +103,18 @@ describe("ModelsDev Service", () => {
   it.live("get() recovers from a corrupted cache file by removing it and returning an empty catalog", () =>
     Effect.gen(function* () {
       yield* writeCacheText("{")
-      const result = yield* provided(
-        ModelsDev.Service.use((s) => s.get()),
-      )
+      const result = yield* provided(ModelsDev.Service.use((s) => s.get()))
       // This fork is config-driven and never fetches; a corrupt cache file is
       // removed and the catalog falls back to empty.
       expect(result).toEqual({})
-      expect(yield* Effect.promise(() => readFile(cacheFile, "utf8").then(() => null, () => "removed"))).toBe("removed")
+      expect(
+        yield* Effect.promise(() =>
+          readFile(cacheFile, "utf8").then(
+            () => null,
+            () => "removed",
+          ),
+        ),
+      ).toBe("removed")
     }),
   )
 

@@ -76,9 +76,7 @@ describe("RuntimeFlags", () => {
 
   it.effect("layer accepts partial test overrides and fills defaults from Config definitions", () =>
     Effect.gen(function* () {
-      const flags = yield* readFlags.pipe(
-        Effect.provide(RuntimeFlags.layer({ bashDefaultTimeoutMs: 1_000 })),
-      )
+      const flags = yield* readFlags.pipe(Effect.provide(RuntimeFlags.layer({ bashDefaultTimeoutMs: 1_000 })))
 
       expect(flags.pure).toBe(false)
       expect(flags.disableExternalSkills).toBe(false)

@@ -637,7 +637,6 @@ it.instance("handles command configuration", () =>
   }),
 )
 
-
 it.instance("migrates mode field to agent field", () =>
   Effect.gen(function* () {
     const test = yield* TestInstance

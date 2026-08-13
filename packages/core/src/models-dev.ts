@@ -155,9 +155,7 @@ const layer = Layer.effect(
       Effect.map((v) => v as Record<string, Provider> | undefined),
     )
 
-    const loadSnapshot = Effect.sync(() =>
-      typeof USTCODE_MODELS_DEV === "undefined" ? undefined : USTCODE_MODELS_DEV,
-    )
+    const loadSnapshot = Effect.sync(() => (typeof USTCODE_MODELS_DEV === "undefined" ? undefined : USTCODE_MODELS_DEV))
 
     const populate = Effect.gen(function* () {
       // An explicitly configured catalog is useful for development and tests,

@@ -41,13 +41,7 @@ const targets = singleFlag
 if (!skipInstall) await $`bun install --os="*" --cpu="*" @opentui/core@${pkg.dependencies["@opentui/core"]}`
 
 for (const item of targets) {
-  const target = [
-    binary,
-    item.os === "win32" ? "windows" : item.os,
-    item.arch,
-  ]
-    .filter(Boolean)
-    .join("-")
+  const target = [binary, item.os === "win32" ? "windows" : item.os, item.arch].filter(Boolean).join("-")
   const name = target.replace(binary, "cli")
   console.log(`building ${name}`)
   const result = await Bun.build({

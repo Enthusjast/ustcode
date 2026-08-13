@@ -155,7 +155,6 @@ export namespace PluginLoader {
     const plan = candidate.plan
     const filePlugin = pluginSource(plan.spec) === "file"
 
-
     report?.start?.(candidate, retry)
 
     const resolved = await resolve(plan, kind)

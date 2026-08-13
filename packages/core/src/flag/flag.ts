@@ -34,9 +34,7 @@ export const Flag = {
   USTCODE_DISABLE_FFF: fff === undefined ? process.platform === "win32" : truthy("USTCODE_DISABLE_FFF"),
 
   // Experimental
-  USTCODE_EXPERIMENTAL_FILEWATCHER: Config.boolean("USTCODE_EXPERIMENTAL_FILEWATCHER").pipe(
-    Config.withDefault(false),
-  ),
+  USTCODE_EXPERIMENTAL_FILEWATCHER: Config.boolean("USTCODE_EXPERIMENTAL_FILEWATCHER").pipe(Config.withDefault(false)),
   USTCODE_EXPERIMENTAL_DISABLE_FILEWATCHER: Config.boolean("USTCODE_EXPERIMENTAL_DISABLE_FILEWATCHER").pipe(
     Config.withDefault(false),
   ),

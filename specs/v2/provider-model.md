@@ -35,9 +35,7 @@ const UnknownEndpoint = Schema.Struct({
   type: Schema.Literal("unknown"),
 })
 
-export const Endpoint = Schema.Union([UnknownEndpoint, OpenAICompletions, AISDK]).pipe(
-  Schema.toTaggedUnion("type"),
-)
+export const Endpoint = Schema.Union([UnknownEndpoint, OpenAICompletions, AISDK]).pipe(Schema.toTaggedUnion("type"))
 export type Endpoint = typeof Endpoint.Type
 
 export const Options = Schema.Struct({
