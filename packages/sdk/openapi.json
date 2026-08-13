@@ -9388,6 +9388,744 @@
         ]
       }
     },
+    "/iwan": {
+      "get": {
+        "tags": ["iWAN"],
+        "operationId": "iwan.status",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "iWAN tunnel status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["disconnected", "login", "servers", "connecting", "connected", "error"]
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                          }
+                        },
+                        "required": ["name", "host", "port"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "selected": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        }
+                      },
+                      "required": ["name", "host", "port"],
+                      "additionalProperties": false
+                    },
+                    "proxy": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "flows": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["address", "port", "flows"],
+                      "additionalProperties": false
+                    },
+                    "loginURL": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "servers"],
+                  "additionalProperties": false,
+                  "description": "iWAN tunnel status"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "IwanApiError | InvalidRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/IwanApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the USTC iWAN login, server selection, and tunnel status.",
+        "summary": "Get iWAN status",
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createUstcodeClient } from \"@enthusjast/ustcode-sdk\n\nconst client = createUstcodeClient()\nawait client.iwan.status({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/iwan/login": {
+      "post": {
+        "tags": ["iWAN"],
+        "operationId": "iwan.login",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "iWAN login state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["disconnected", "login", "servers", "connecting", "connected", "error"]
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                          }
+                        },
+                        "required": ["name", "host", "port"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "selected": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        }
+                      },
+                      "required": ["name", "host", "port"],
+                      "additionalProperties": false
+                    },
+                    "proxy": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "flows": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["address", "port", "flows"],
+                      "additionalProperties": false
+                    },
+                    "loginURL": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "servers"],
+                  "additionalProperties": false,
+                  "description": "iWAN login state"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "IwanApiError | InvalidRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/IwanApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Start the USTC iWAN OIDC PKCE login flow.",
+        "summary": "Start iWAN login",
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createUstcodeClient } from \"@enthusjast/ustcode-sdk\n\nconst client = createUstcodeClient()\nawait client.iwan.login({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/iwan/callback": {
+      "post": {
+        "tags": ["iWAN"],
+        "operationId": "iwan.callback",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "iWAN server list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["disconnected", "login", "servers", "connecting", "connected", "error"]
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                          }
+                        },
+                        "required": ["name", "host", "port"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "selected": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        }
+                      },
+                      "required": ["name", "host", "port"],
+                      "additionalProperties": false
+                    },
+                    "proxy": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "flows": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["address", "port", "flows"],
+                      "additionalProperties": false
+                    },
+                    "loginURL": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "servers"],
+                  "additionalProperties": false,
+                  "description": "iWAN server list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "IwanApiError | InvalidRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/IwanApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Exchange the pasted OIDC redirect URL and retrieve iWAN servers.",
+        "summary": "Complete iWAN login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "redirect": {
+                    "type": "string"
+                  }
+                },
+                "required": ["redirect"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createUstcodeClient } from \"@enthusjast/ustcode-sdk\n\nconst client = createUstcodeClient()\nawait client.iwan.callback({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/iwan/connect": {
+      "post": {
+        "tags": ["iWAN"],
+        "operationId": "iwan.connect",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "iWAN tunnel status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["disconnected", "login", "servers", "connecting", "connected", "error"]
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                          }
+                        },
+                        "required": ["name", "host", "port"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "selected": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        }
+                      },
+                      "required": ["name", "host", "port"],
+                      "additionalProperties": false
+                    },
+                    "proxy": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "flows": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["address", "port", "flows"],
+                      "additionalProperties": false
+                    },
+                    "loginURL": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "servers"],
+                  "additionalProperties": false,
+                  "description": "iWAN tunnel status"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "IwanApiError | InvalidRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/IwanApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Connect the selected USTC iWAN server and start the local SOCKS tunnel.",
+        "summary": "Connect iWAN",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": ["index"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createUstcodeClient } from \"@enthusjast/ustcode-sdk\n\nconst client = createUstcodeClient()\nawait client.iwan.connect({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/iwan/stop": {
+      "post": {
+        "tags": ["iWAN"],
+        "operationId": "iwan.stop",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "iWAN tunnel status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": ["disconnected", "login", "servers", "connecting", "connected", "error"]
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "servers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "host": {
+                            "type": "string"
+                          },
+                          "port": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 65535
+                          }
+                        },
+                        "required": ["name", "host", "port"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "selected": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "host": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        }
+                      },
+                      "required": ["name", "host", "port"],
+                      "additionalProperties": false
+                    },
+                    "proxy": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 65535
+                        },
+                        "flows": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": ["address", "port", "flows"],
+                      "additionalProperties": false
+                    },
+                    "loginURL": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["state", "servers"],
+                  "additionalProperties": false,
+                  "description": "iWAN tunnel status"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "IwanApiError | InvalidRequestError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/IwanApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Stop the USTC iWAN tunnel.",
+        "summary": "Stop iWAN",
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createUstcodeClient } from \"@enthusjast/ustcode-sdk\n\nconst client = createUstcodeClient()\nawait client.iwan.stop({\n  ...\n})"
+          }
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "tags": ["ustcode HttpApi"],
@@ -23044,6 +23782,27 @@
         "required": ["name", "data"],
         "additionalProperties": false
       },
+      "IwanApiError": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["IwanError"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["message"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "data"],
+        "additionalProperties": false
+      },
       "UnauthorizedError": {
         "type": "object",
         "properties": {
@@ -36431,6 +37190,10 @@
     {
       "name": "workspace",
       "description": "Experimental HttpApi workspace routes."
+    },
+    {
+      "name": "iWAN",
+      "description": "USTC iWAN network tunnel routes."
     },
     {
       "name": "ustcode HttpApi",
