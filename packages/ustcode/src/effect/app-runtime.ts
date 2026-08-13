@@ -52,6 +52,8 @@ import { LayerNode } from "@enthusjast/ustcode-core/effect/layer-node"
 import { AppNodeBuilderV1 } from "./app-node-builder-v1"
 import { SessionProjector } from "@enthusjast/ustcode-core/session/projector"
 import { httpClient } from "@enthusjast/ustcode-core/effect/app-node-platform"
+import { Iwan } from "@/iwan/service"
+import { IwanHttp } from "@/iwan/http"
 
 export const AppLayer = AppNodeBuilderV1.build(
   LayerNode.group([
@@ -101,7 +103,9 @@ export const AppLayer = AppNodeBuilderV1.build(
     Workspace.node,
     Worktree.node,
     Installation.node,
+    Iwan.node,
   ]),
+  [[httpClient, IwanHttp.node]],
 ).pipe(Layer.provideMerge(AppNodeBuilderV1.build(Ripgrep.node)), Layer.provideMerge(Observability.layer))
 
 const rt = ManagedRuntime.make(AppLayer, { memoMap })

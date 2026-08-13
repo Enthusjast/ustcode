@@ -46,6 +46,7 @@ export function hints(template: string) {
 export const Default = {
   INIT: "init",
   REVIEW: "review",
+  IWAN: "iwan",
 } as const
 
 export interface Interface {
@@ -85,6 +86,14 @@ const layer = Layer.effect(
         },
         subtask: true,
         hints: hints(PROMPT_REVIEW),
+      }
+
+      commands[Default.IWAN] = {
+        name: Default.IWAN,
+        description: "connect and manage the USTC iWAN network tunnel",
+        source: "command",
+        template: "",
+        hints: [],
       }
 
       for (const [name, command] of Object.entries(cfg.command ?? {})) {

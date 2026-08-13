@@ -2661,6 +2661,13 @@ export type WorkspaceWarpError = {
   }
 }
 
+export type IwanApiError = {
+  name: "IwanError"
+  data: {
+    message: string
+  }
+}
+
 export type UnauthorizedError = {
   _tag: "UnauthorizedError"
   message: string
@@ -11034,6 +11041,255 @@ export type ExperimentalWorkspaceWarpResponses = {
 
 export type ExperimentalWorkspaceWarpResponse =
   ExperimentalWorkspaceWarpResponses[keyof ExperimentalWorkspaceWarpResponses]
+
+export type IwanStatusData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/iwan"
+}
+
+export type IwanStatusErrors = {
+  /**
+   * IwanApiError | InvalidRequestError
+   */
+  400: IwanApiError | InvalidRequestError
+}
+
+export type IwanStatusError = IwanStatusErrors[keyof IwanStatusErrors]
+
+export type IwanStatusResponses = {
+  /**
+   * iWAN tunnel status
+   */
+  200: {
+    state: "disconnected" | "login" | "servers" | "connecting" | "connected" | "error"
+    username?: string
+    servers: Array<{
+      name: string
+      host: string
+      port: number
+    }>
+    selected?: number
+    server?: {
+      name: string
+      host: string
+      port: number
+    }
+    proxy?: {
+      address: string
+      port: number
+      flows: number
+    }
+    loginURL?: string
+    error?: string
+  }
+}
+
+export type IwanStatusResponse = IwanStatusResponses[keyof IwanStatusResponses]
+
+export type IwanLoginData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/iwan/login"
+}
+
+export type IwanLoginErrors = {
+  /**
+   * IwanApiError | InvalidRequestError
+   */
+  400: IwanApiError | InvalidRequestError
+}
+
+export type IwanLoginError = IwanLoginErrors[keyof IwanLoginErrors]
+
+export type IwanLoginResponses = {
+  /**
+   * iWAN login state
+   */
+  200: {
+    state: "disconnected" | "login" | "servers" | "connecting" | "connected" | "error"
+    username?: string
+    servers: Array<{
+      name: string
+      host: string
+      port: number
+    }>
+    selected?: number
+    server?: {
+      name: string
+      host: string
+      port: number
+    }
+    proxy?: {
+      address: string
+      port: number
+      flows: number
+    }
+    loginURL?: string
+    error?: string
+  }
+}
+
+export type IwanLoginResponse = IwanLoginResponses[keyof IwanLoginResponses]
+
+export type IwanCallbackData = {
+  body?: {
+    redirect: string
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/iwan/callback"
+}
+
+export type IwanCallbackErrors = {
+  /**
+   * IwanApiError | InvalidRequestError
+   */
+  400: IwanApiError | InvalidRequestError
+}
+
+export type IwanCallbackError = IwanCallbackErrors[keyof IwanCallbackErrors]
+
+export type IwanCallbackResponses = {
+  /**
+   * iWAN server list
+   */
+  200: {
+    state: "disconnected" | "login" | "servers" | "connecting" | "connected" | "error"
+    username?: string
+    servers: Array<{
+      name: string
+      host: string
+      port: number
+    }>
+    selected?: number
+    server?: {
+      name: string
+      host: string
+      port: number
+    }
+    proxy?: {
+      address: string
+      port: number
+      flows: number
+    }
+    loginURL?: string
+    error?: string
+  }
+}
+
+export type IwanCallbackResponse = IwanCallbackResponses[keyof IwanCallbackResponses]
+
+export type IwanConnectData = {
+  body?: {
+    index: number
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/iwan/connect"
+}
+
+export type IwanConnectErrors = {
+  /**
+   * IwanApiError | InvalidRequestError
+   */
+  400: IwanApiError | InvalidRequestError
+}
+
+export type IwanConnectError = IwanConnectErrors[keyof IwanConnectErrors]
+
+export type IwanConnectResponses = {
+  /**
+   * iWAN tunnel status
+   */
+  200: {
+    state: "disconnected" | "login" | "servers" | "connecting" | "connected" | "error"
+    username?: string
+    servers: Array<{
+      name: string
+      host: string
+      port: number
+    }>
+    selected?: number
+    server?: {
+      name: string
+      host: string
+      port: number
+    }
+    proxy?: {
+      address: string
+      port: number
+      flows: number
+    }
+    loginURL?: string
+    error?: string
+  }
+}
+
+export type IwanConnectResponse = IwanConnectResponses[keyof IwanConnectResponses]
+
+export type IwanStopData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/iwan/stop"
+}
+
+export type IwanStopErrors = {
+  /**
+   * IwanApiError | InvalidRequestError
+   */
+  400: IwanApiError | InvalidRequestError
+}
+
+export type IwanStopError = IwanStopErrors[keyof IwanStopErrors]
+
+export type IwanStopResponses = {
+  /**
+   * iWAN tunnel status
+   */
+  200: {
+    state: "disconnected" | "login" | "servers" | "connecting" | "connected" | "error"
+    username?: string
+    servers: Array<{
+      name: string
+      host: string
+      port: number
+    }>
+    selected?: number
+    server?: {
+      name: string
+      host: string
+      port: number
+    }
+    proxy?: {
+      address: string
+      port: number
+      flows: number
+    }
+    loginURL?: string
+    error?: string
+  }
+}
+
+export type IwanStopResponse = IwanStopResponses[keyof IwanStopResponses]
 
 export type V2HealthGetData = {
   body?: never

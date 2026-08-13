@@ -49,6 +49,7 @@ import { useToast } from "../../ui/toast"
 import { useKV } from "../../context/kv"
 import { createFadeIn } from "../../util/signal"
 import { DialogSkill } from "../dialog-skill"
+import { DialogIwan } from "../dialog-iwan"
 import { DialogWorkspaceUnavailable } from "../dialog-workspace-unavailable"
 import { useArgs } from "../../context/args"
 import { USTCODE_BASE_MODE, useBindings, useCommandShortcut, useLeaderActive, useUstcodeKeymap } from "../../keymap"
@@ -958,9 +959,22 @@ export function Prompt(props: PromptProps) {
     if (workspace.creating() || move.creating()) return false
     if (auto()?.visible) return false
     if (!store.prompt.input) return false
+    const trimmed = store.prompt.input.trim()
+    const firstLine = trimmed.split("\n", 1)[0] ?? ""
+    const [slashCommand, ...slashArgs] = firstLine.split(" ")
+    if (slashCommand === "/iwan") {
+      clearPrompt()
+      if (slashArgs.join(" ").trim() === "stop") {
+        const result = await sdk.client.iwan.stop()
+        if (result.error) toast.show({ variant: "error", message: errorMessage(result.error) })
+        else toast.show({ variant: "success", message: "USTC iWAN tunnel stopped" })
+      } else {
+        dialog.replace(() => <DialogIwan />)
+      }
+      return true
+    }
     const agent = local.agent.current()
     if (!agent) return false
-    const trimmed = store.prompt.input.trim()
     if (trimmed === "exit" || trimmed === "quit" || trimmed === ":q") {
       void exit()
       return true

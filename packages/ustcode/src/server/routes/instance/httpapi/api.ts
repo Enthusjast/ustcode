@@ -25,6 +25,7 @@ import { SessionApi } from "./groups/session"
 import { SyncApi } from "./groups/sync"
 import { TuiApi } from "./groups/tui"
 import { WorkspaceApi } from "./groups/workspace"
+import { IwanApi } from "./groups/iwan"
 import { makeApi } from "@enthusjast/ustcode-protocol/api"
 import { LocationMiddleware } from "@enthusjast/ustcode-server/location"
 import { SessionLocationMiddleware } from "@enthusjast/ustcode-server/middleware/session-location"
@@ -74,6 +75,7 @@ export const InstanceHttpApi = HttpApi.make("ustcode-instance")
   .addHttpApi(SyncApi)
   .addHttpApi(TuiApi)
   .addHttpApi(WorkspaceApi)
+  .addHttpApi(IwanApi)
   .middleware(SchemaErrorMiddleware)
 
 export const UstCodeHttpApi = HttpApi.make("ustcode")

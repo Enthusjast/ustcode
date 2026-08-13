@@ -29,6 +29,7 @@ import { ModelV2 } from "@enthusjast/ustcode-core/model"
 import { ModelStatus } from "./model-status"
 import { RuntimeFlags } from "@/effect/runtime-flags"
 import { ProviderError } from "./error"
+import { Iwan } from "@/iwan/service"
 
 const OPENAI_HEADER_TIMEOUT_DEFAULT = 300_000
 
@@ -497,6 +498,7 @@ const layer = Layer.effect(
     const plugin = yield* Plugin.Service
     const modelsDevSvc = yield* ModelsDev.Service
     const runtimeFlags = yield* RuntimeFlags.Service
+    const iwan = yield* Iwan.Service
 
     const state = yield* InstanceState.make<State>(() =>
       Effect.gen(function* () {
@@ -842,17 +844,21 @@ const layer = Layer.effect(
             ...model.headers,
           }
 
+        const isUstc = model.providerID === ProviderV2.ID.USTC || model.providerID === ProviderV2.ID.ustcode
+        const iwanProxyPort = isUstc ? iwan.port() : undefined
+
         const key = Hash.fast(
           JSON.stringify({
             providerID: model.providerID,
             npm: model.api.npm,
             options,
+            iwanProxyPort,
           }),
         )
         const existing = s.sdk.get(key)
         if (existing) return existing
 
-        const customFetch = options["fetch"]
+        const customFetch = isUstc ? iwan.fetch : options["fetch"]
         const chunkTimeout = options["chunkTimeout"]
         const headerTimeout = options["headerTimeout"]
         delete options["chunkTimeout"]
@@ -1096,7 +1102,7 @@ export function parseModel(model: string) {
 export const node = LayerNode.make({
   service: Service,
   layer: layer,
-  deps: [FSUtil.node, Config.node, Auth.node, Env.node, Plugin.node, ModelsDev.node, RuntimeFlags.node],
+  deps: [FSUtil.node, Config.node, Auth.node, Env.node, Plugin.node, ModelsDev.node, RuntimeFlags.node, Iwan.node],
 })
 
 export * as Provider from "./provider"

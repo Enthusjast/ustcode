@@ -379,6 +379,7 @@
         "opentui-spinner": "catalog:",
         "remeda": "catalog:",
         "semver": "^7.6.3",
+        "socks-proxy-agent": "8.0.5",
         "solid-js": "catalog:",
         "strip-ansi": "7.1.2",
         "tree-sitter-bash": "0.25.0",

@@ -1,15 +1,21 @@
-import { createMemo, Match, onCleanup, onMount, Show, Switch } from "solid-js"
+import { createMemo, createSignal, Match, onCleanup, onMount, Show, Switch } from "solid-js"
+import type { IwanStatusResponse } from "@enthusjast/ustcode-sdk/v2"
 import { useTheme } from "../../context/theme"
 import { useSync } from "../../context/sync"
 import { useDirectory } from "../../context/directory"
 import { useConnected } from "../../component/use-connected"
 import { createStore } from "solid-js/store"
 import { useRoute } from "../../context/route"
+import { useSDK } from "../../context/sdk"
+import { useDialog } from "../../ui/dialog"
+import { DialogIwan } from "../../component/dialog-iwan"
 
 export function Footer() {
   const { theme } = useTheme()
   const sync = useSync()
   const route = useRoute()
+  const sdk = useSDK()
+  const dialog = useDialog()
   const mcp = createMemo(() => Object.values(sync.data.mcp).filter((x) => x.status === "connected").length)
   const mcpError = createMemo(() => Object.values(sync.data.mcp).some((x) => x.status === "failed"))
   const lsp = createMemo(() => Object.keys(sync.data.lsp))
@@ -19,9 +25,36 @@ export function Footer() {
   })
   const directory = useDirectory()
   const connected = useConnected()
+  const [iwan, setIwan] = createSignal<IwanStatusResponse>()
 
   const [store, setStore] = createStore({
     welcome: false,
+  })
+
+  onMount(() => {
+    let active = true
+    let pending = false
+
+    const refresh = () => {
+      if (!active || pending) return
+      pending = true
+      void sdk.client.iwan
+        .status()
+        .then((result) => {
+          if (active && result.data) setIwan(result.data)
+        })
+        .catch(() => {})
+        .finally(() => {
+          pending = false
+        })
+    }
+
+    refresh()
+    const timer = setInterval(refresh, 3000)
+    onCleanup(() => {
+      active = false
+      clearInterval(timer)
+    })
   })
 
   onMount(() => {
@@ -47,6 +80,20 @@ export function Footer() {
     onCleanup(() => {
       timeouts.forEach(clearTimeout)
     })
+  })
+
+  const iwanStatus = createMemo(() => {
+    const current = iwan()
+    if (!current || current.state === "disconnected") return
+    if (current.state === "connected") {
+      return {
+        color: theme.success,
+        icon: "●",
+        label: `iWAN${current.server?.name ? ` · ${current.server.name}` : ""}`,
+      }
+    }
+    if (current.state === "error") return { color: theme.error, icon: "!", label: "iWAN error" }
+    return { color: theme.warning, icon: "◌", label: "iWAN connecting" }
   })
 
   return (
@@ -85,6 +132,13 @@ export function Footer() {
             <text fg={theme.textMuted}>/status</text>
           </Match>
         </Switch>
+        <Show when={iwanStatus()}>
+          {(status) => (
+            <text fg={theme.text} onMouseUp={() => dialog.replace(() => <DialogIwan />)}>
+              <span style={{ fg: status().color }}>{status().icon}</span> {status().label}
+            </text>
+          )}
+        </Show>
       </box>
     </box>
   )

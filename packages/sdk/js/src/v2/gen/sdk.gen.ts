@@ -85,6 +85,16 @@ import type {
   GlobalUpgradeResponses,
   InstanceDisposeErrors,
   InstanceDisposeResponses,
+  IwanCallbackErrors,
+  IwanCallbackResponses,
+  IwanConnectErrors,
+  IwanConnectResponses,
+  IwanLoginErrors,
+  IwanLoginResponses,
+  IwanStatusErrors,
+  IwanStatusResponses,
+  IwanStopErrors,
+  IwanStopResponses,
   LocationRef,
   LspStatusErrors,
   LspStatusResponses,
@@ -4834,6 +4844,172 @@ export class Tui extends HeyApiClient {
   }
 }
 
+export class Iwan extends HeyApiClient {
+  /**
+   * Get iWAN status
+   *
+   * Get the USTC iWAN login, server selection, and tunnel status.
+   */
+  public status<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<IwanStatusResponses, IwanStatusErrors, ThrowOnError>({
+      url: "/iwan",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Start iWAN login
+   *
+   * Start the USTC iWAN OIDC PKCE login flow.
+   */
+  public login<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<IwanLoginResponses, IwanLoginErrors, ThrowOnError>({
+      url: "/iwan/login",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Complete iWAN login
+   *
+   * Exchange the pasted OIDC redirect URL and retrieve iWAN servers.
+   */
+  public callback<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      redirect?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "redirect" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<IwanCallbackResponses, IwanCallbackErrors, ThrowOnError>({
+      url: "/iwan/callback",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Connect iWAN
+   *
+   * Connect the selected USTC iWAN server and start the local SOCKS tunnel.
+   */
+  public connect<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      index?: number
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "index" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<IwanConnectResponses, IwanConnectErrors, ThrowOnError>({
+      url: "/iwan/connect",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Stop iWAN
+   *
+   * Stop the USTC iWAN tunnel.
+   */
+  public stop<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<IwanStopResponses, IwanStopErrors, ThrowOnError>({
+      url: "/iwan/stop",
+      ...options,
+      ...params,
+    })
+  }
+}
+
 export class Health extends HeyApiClient {
   /**
    * Check server health
@@ -7023,6 +7199,11 @@ export class UstcodeClient extends HeyApiClient {
   private _tui?: Tui
   get tui(): Tui {
     return (this._tui ??= new Tui({ client: this.client }))
+  }
+
+  private _iwan?: Iwan
+  get iwan(): Iwan {
+    return (this._iwan ??= new Iwan({ client: this.client }))
   }
 
   private _v2?: V2

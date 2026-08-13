@@ -35,3 +35,4 @@ tsconfig.tsbuildinfo
 
 # Local config (may contain API keys)
 .ustcode/
+.gstack/

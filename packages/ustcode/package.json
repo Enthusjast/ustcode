@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "@enthusjast/ustcode",
   "type": "module",
   "license": "MIT",
@@ -111,6 +111,7 @@
     "opentui-spinner": "catalog:",
     "remeda": "catalog:",
     "semver": "^7.6.3",
+    "socks-proxy-agent": "8.0.5",
     "solid-js": "catalog:",
     "strip-ansi": "7.1.2",
     "tree-sitter-bash": "0.25.0",

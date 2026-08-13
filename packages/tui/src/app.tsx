@@ -80,6 +80,7 @@ import {
 
 import type { EventSource } from "./context/sdk"
 import { DialogVariant } from "./component/dialog-variant"
+import { DialogIwan } from "./component/dialog-iwan"
 import { createTuiAttention } from "./attention"
 import * as TuiAudio from "./audio"
 import { win32DisableProcessedInput, win32FlushInputBuffer } from "./terminal-win32"
@@ -588,6 +589,16 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
             type: "home",
           })
           dialog.clear()
+        },
+      },
+      {
+        name: "ustcode.iwan",
+        title: "Connect USTC iWAN",
+        category: "Network",
+        hidden: true,
+        slashName: "iwan",
+        run: () => {
+          dialog.replace(() => <DialogIwan />)
         },
       },
       {
