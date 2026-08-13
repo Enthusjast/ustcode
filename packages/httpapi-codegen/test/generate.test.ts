@@ -619,7 +619,11 @@ describe("HttpApiCodegen.generate", () => {
             Bun.file(new URL(`generated/${file.path}`, import.meta.url)).text(),
             format(file.content, { parser: "typescript", semi: false, printWidth: 120 }),
           ]),
-        ).pipe(Effect.map(([content, expected]) => expect(content).toBe(expected))),
+        ).pipe(
+          Effect.map(([content, expected]) =>
+            expect(content.replaceAll("\r\n", "\n")).toBe(expected.replaceAll("\r\n", "\n")),
+          ),
+        ),
       )
     }),
   )
