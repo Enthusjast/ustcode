@@ -790,11 +790,11 @@ function defaultModelFromConfig(
   if (configured && providers[configured.providerID]?.models[configured.modelID]) return configured
 
   // First-session ACP startup must not scan historical sessions just to infer
-  // a default. Configured model, ustcode provider, then sorted best model keep
+  // a default. Configured model, USTC provider, then sorted best model keep
   // the protocol response deterministic without extra session/message reads.
-  const ustcodeProvider = providers[ProviderV2.ID.make("ustcode")]
-  const ustcodeModel = ustcodeProvider ? Provider.sort(Object.values(ustcodeProvider.models))[0] : undefined
-  if (ustcodeProvider && ustcodeModel) return { providerID: ustcodeProvider.id, modelID: ustcodeModel.id }
+  const ustcProvider = providers[ProviderV2.ID.USTC] ?? providers[ProviderV2.ID.ustcode]
+  const ustcModel = ustcProvider ? Provider.sort(Object.values(ustcProvider.models))[0] : undefined
+  if (ustcProvider && ustcModel) return { providerID: ustcProvider.id, modelID: ustcModel.id }
 
   const best = Provider.sort(Object.values(providers).flatMap((provider) => Object.values(provider.models)))[0]
   if (best) return { providerID: best.providerID, modelID: best.id }

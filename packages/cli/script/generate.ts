@@ -1,7 +1,7 @@
-const modelsUrl = process.env.USTCODE_MODELS_URL || "https://models.ustcode.ai"
+import path from "path"
 
 export const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
-  : await fetch(`${modelsUrl}/api.json`).then((response) => response.text())
+  : await Bun.file(path.resolve(import.meta.dir, "../../ustcode/models/ustc.json")).text()
 
-console.log("Loaded models.dev snapshot")
+console.log("Loaded local USTC model catalog")

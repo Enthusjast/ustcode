@@ -1,9 +1,10 @@
 # ustcode
 
 USTC Coding Agent
+
 ---
 
-### 安装
+## 安装
 
 ```bash
 # 直接安装 (YOLO)
@@ -18,7 +19,7 @@ irm https://ustcode.enthusjast.cc/install.ps1 | iex
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
-#### 安装目录
+### 安装目录
 
 脚本将二进制安装到 `$HOME/.ustcode/bin`，并默认把该目录加入 `$PATH`：
 
@@ -33,7 +34,7 @@ curl -fsSL https://ustcode.enthusjast.cc/install | bash -s -- --binary /path/to/
 curl -fsSL https://ustcode.enthusjast.cc/install | bash -s -- --no-modify-path
 ```
 
-#### 卸载
+### 卸载
 
 ```bash
 # 下载并运行卸载脚本（移除二进制和 PATH 配置）
@@ -51,7 +52,7 @@ irm https://ustcode.enthusjast.cc/uninstall.ps1 | iex
 irm https://ustcode.enthusjast.cc/uninstall.ps1 | iex -ArgumentList "-Purge"
 ```
 
-### Agents
+## Agents
 
 UstCode 内置两种 Agent，可用 `Tab` 键快速切换：
 
@@ -63,11 +64,11 @@ UstCode 内置两种 Agent，可用 `Tab` 键快速切换：
 
 另外还包含一个 **general** 子 Agent，用于复杂搜索和多步任务，内部使用，也可在消息中输入 `@general` 调用。
 
-### 模型与供应商
+## 模型与供应商
 
 **USTC 供应商已内置**（USTC 词元计划，OpenAI 兼容 API），开箱即用，无需手动配置 provider。
 
-**1. 设置 API Key**
+### 1. 设置 API Key
 
 API Key 需要从环境变量读取：
 
@@ -75,13 +76,13 @@ API Key 需要从环境变量读取：
 export USTC_API_KEY="你的 USTC API Key"
 ```
 
-**2. 指定模型**
+### 2. 指定模型
 
 ```bash
 ustcode --model USTC/qwen-chat
 ```
 
-内置的模型（完整列表可用 `ustcode models` 查看；上下文长度与定价见 [USTC-API-PRICING.md](USTC-API-PRICING.md)）：
+内置的模型 (来自 USTC 词元计划)
 
 | 模型 ID | 说明 |
 | --- | --- |
@@ -102,7 +103,7 @@ ustcode --model USTC/qwen-chat
 | `USTC/smart/default` | Smart Default |
 | `USTC/unlimited-ocr` | OCR（支持图像输入） |
 
-**3. 其他供应商**
+### 3. 其他供应商
 
 UstCode 采用配置驱动，不依赖 models.dev。如需使用其他 OpenAI 兼容的模型服务，在配置文件（`ustcode.jsonc`）中按格式添加即可：
 
@@ -121,3 +122,25 @@ UstCode 采用配置驱动，不依赖 models.dev。如需使用其他 OpenAI �
   }
 }
 ```
+
+### 4. 查询 USTC 用量与额度
+
+USTC API Key 同时可用于查询当前窗口的花费、余量、滚动限额、请求限制和每日用量：
+
+```bash
+# 默认查询最近 7 个日历日
+ustcode usage
+
+# 查看按模型聚合的远端用量和每日明细
+ustcode usage --models --daily
+
+# 指定日期范围
+ustcode usage --start-date 2026-08-01 --end-date 2026-08-13
+
+# 获取便于脚本处理的脱敏 JSON（不会输出原始 API Key）
+ustcode usage --json
+```
+
+命令优先读取 `USTC_API_KEY`，也会读取通过 `ustcode providers login --provider USTC` 保存的凭据。接口细节见 [`ustc-llm-usage-api.md`](./ustc-llm-usage-api.md)。
+
+`ustcode stats` 仍然遵循 OpenCode 的本地会话统计语义：显示本地记录的 token、模型和成本；`ustcode usage`（也可写成 `ustcode quota`）显示 USTC 服务端的真实余额、滚动预算和账户用量。模型选择器和会话底部的 context/cost 提示使用模型元数据中的 `limit`/`cost`，不把账户余额伪装成模型上下文上限。

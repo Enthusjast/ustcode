@@ -800,9 +800,9 @@ function App(props: { onSnapshot?: () => Promise<string[]>; pluginHost: TuiPlugi
       },
       {
         name: "docs.open",
-        title: "Open docs",
+        title: "Open project documentation",
         run: () => {
-          open("https://ustcode.enthusjast.cc/docs").catch(() => {})
+          open("https://github.com/Enthusjast/ustcode#readme").catch(() => {})
           dialog.clear()
         },
         category: "System",

@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises"
 import * as path from "node:path"
 
 const RECORDINGS_DIR = path.resolve(import.meta.dir, "..", "test", "fixtures", "recordings")
-const MODELS_DEV_URL = "https://models.ustcode.ai/api.json"
+const MODELS_FILE = path.resolve(import.meta.dir, "../../ustcode/models/ustc.json")
 
 type JsonRecord = Record<string, unknown>
 
@@ -198,7 +198,7 @@ const rowFor = (models: JsonRecord, file: string, cassette: unknown): Row | unde
 const money = (value: number) => (value === 0 ? "$0.000000" : `$${value.toFixed(6)}`)
 const tokens = (value: number) => value.toLocaleString("en-US")
 
-const models = (await (await fetch(MODELS_DEV_URL)).json()) as JsonRecord
+const models = (await readJson(MODELS_FILE)) as JsonRecord
 const rows = (
   await Promise.all(
     (await walk(RECORDINGS_DIR))
@@ -217,7 +217,7 @@ const totals = rows.reduce(
 
 console.log("# Recording Cost Report")
 console.log("")
-console.log(`Pricing: ${MODELS_DEV_URL}`)
+console.log(`Pricing: ${path.relative(process.cwd(), MODELS_FILE)}`)
 console.log(`Cassettes: ${rows.length}`)
 console.log(`Reported cost: ${money(totals.reportedCost)}`)
 console.log(`Estimated cost: ${money(totals.estimatedCost)}`)

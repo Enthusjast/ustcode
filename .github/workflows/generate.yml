@@ -18,6 +18,10 @@ jobs:
       - name: Setup Bun
         uses: ./.github/actions/setup-bun
 
+      - name: Configure git identity
+        run: |
+          git config user.email "bot@ustcode.enthusjast.cc"
+          git config user.name "ustcode"
 
       - name: Generate
         run: ./script/generate.ts

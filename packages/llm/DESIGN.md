@@ -1,13 +1,13 @@
 # AI Library Design
 
-> Discussion draft. This document describes the intended replacement for the
+> Discussion draft. This document describes the intended evolution of the
 > current private `@enthusjast/ustcode-llm` API. Names and exact TypeScript signatures
 > are illustrative until implementation, but the domain boundaries and defaults
 > are deliberate.
 
 ## Status
 
-- Proposed package: `@enthusjast/ustcode-ai`
+- Proposed package: `@enthusjast/ustcode-llm`
 - Initial stable domain: `LLM`
 - Release posture: pre-1.0, with a stable-core intent
 - Migration posture: clean break; do not preserve compatibility aliases
@@ -138,8 +138,8 @@ the entire protocol-authoring API is experimental.
 
 ```ts
 import { Effect } from "effect"
-import { LLM } from "@enthusjast/ustcode-ai"
-import { OpenAI } from "@enthusjast/ustcode-ai/providers/openai"
+import { LLM } from "@enthusjast/ustcode-llm"
+import { OpenAI } from "@enthusjast/ustcode-llm/providers/openai"
 
 // Environment-based credentials are a provider default. No LLMClient layer is
 // required: the Effect exposes standard runtime dependencies directly.
@@ -189,9 +189,9 @@ runtime provisioning, and makes `generate` mean a complete run.
 ### Environment defaults
 
 ```ts
-import { OpenAI } from "@enthusjast/ustcode-ai/providers/openai"
+import { OpenAI } from "@enthusjast/ustcode-llm/providers/openai"
 
-// Open strings receive autocomplete for IDs from the generated models.dev
+// Open strings receive autocomplete for IDs from the generated model catalog
 // snapshot but continue to accept newly released and fine-tuned model IDs.
 const model = OpenAI.model("gpt-4.1-mini")
 ```
@@ -320,7 +320,7 @@ There is no `LLM.updateRequest(...)` helper and no request Schema class.
 ### Conversation history
 
 ```ts
-import { Message } from "@enthusjast/ustcode-ai"
+import { Message } from "@enthusjast/ustcode-llm"
 
 const request = LLM.request({
   system: "You are concise.",
@@ -345,7 +345,7 @@ change at a specific point in history.
 
 ```ts
 import { Effect, Schema } from "effect"
-import { LLM, Tool } from "@enthusjast/ustcode-ai"
+import { LLM, Tool } from "@enthusjast/ustcode-llm"
 
 const tools = {
   getWeather: Tool.make({
@@ -634,7 +634,7 @@ than permanently encoding one cross-provider workaround.
 
 ## Model Catalog
 
-`models.dev` is the release-time source for:
+The versioned model catalog is the release-time source for:
 
 - Model ID suggestions
 - Capabilities and modalities
@@ -649,7 +649,7 @@ Provider definitions may correct generated metadata where protocol-specific
 knowledge is more accurate. Precedence is:
 
 ```text
-models.dev snapshot
+model catalog snapshot
   < provider-definition correction
   < provider configuration override
   < model-selection override
@@ -665,7 +665,7 @@ explicitly overrides the model declaration.
 `GenerateResult` aggregates normalized usage across every turn, including cache
 read/write usage where providers report it.
 
-It also exposes estimated cost using the generated models.dev pricing snapshot:
+It also exposes estimated cost using the generated catalog pricing snapshot:
 
 ```ts
 result.usage.inputTokens
@@ -878,8 +878,8 @@ Promise wrappers live at a separate subpath so the root remains unambiguously
 Effect-first:
 
 ```ts
-import { LLM } from "@enthusjast/ustcode-ai/promise"
-import { OpenAI } from "@enthusjast/ustcode-ai/providers/openai"
+import { LLM } from "@enthusjast/ustcode-llm/promise"
+import { OpenAI } from "@enthusjast/ustcode-llm/providers/openai"
 
 const result = await LLM.generate({
   model: OpenAI.model("gpt-4.1-mini"),
@@ -917,7 +917,7 @@ error, stopping, or cancellation behavior.
 Schemas live in a dedicated namespace/subpath instead of flooding root exports:
 
 ```ts
-import { LLMSchema } from "@enthusjast/ustcode-ai/schema"
+import { LLMSchema } from "@enthusjast/ustcode-llm/schema"
 
 const request = yield * Schema.decodeUnknown(LLMSchema.Request)(input)
 ```
@@ -942,7 +942,7 @@ Provider authoring is public but experimental.
 ### Declarative provider definition
 
 ```ts
-import { Provider, Protocol } from "@enthusjast/ustcode-ai/provider"
+import { Provider, Protocol } from "@enthusjast/ustcode-llm/provider"
 
 export const ExampleAI = Provider.define({
   id: "example",
@@ -974,7 +974,7 @@ patching. It must not register globally.
 Built-ins export their immutable definition for advanced forking:
 
 ```ts
-import { OpenAI } from "@enthusjast/ustcode-ai/providers/openai"
+import { OpenAI } from "@enthusjast/ustcode-llm/providers/openai"
 
 const PatchedOpenAI = OpenAI.definition.with({
   protocols: {
@@ -1024,25 +1024,25 @@ experimental and do not receive the high-level API's compatibility promise.
 Illustrative export layout:
 
 ```text
-@enthusjast/ustcode-ai
+@enthusjast/ustcode-llm
   LLM
   Message
   Tool
   StopWhen
   stable domain types
 
-@enthusjast/ustcode-ai/promise
+@enthusjast/ustcode-llm/promise
   Promise/AsyncIterable LLM facade
 
-@enthusjast/ustcode-ai/schema
+@enthusjast/ustcode-llm/schema
   serializable domain schemas
 
-@enthusjast/ustcode-ai/provider
+@enthusjast/ustcode-llm/provider
   experimental Provider and Protocol authoring APIs
 
-@enthusjast/ustcode-ai/providers/openai
-@enthusjast/ustcode-ai/providers/anthropic
-@enthusjast/ustcode-ai/providers/google
+@enthusjast/ustcode-llm/providers/openai
+@enthusjast/ustcode-llm/providers/anthropic
+@enthusjast/ustcode-llm/providers/google
 ...
 ```
 
@@ -1074,7 +1074,6 @@ The redesign intentionally removes or changes these current concepts:
 
 | Current                                 | Proposed                                                    |
 | --------------------------------------- | ----------------------------------------------------------- |
-| `@enthusjast/ustcode-llm`                      | `@enthusjast/ustcode-ai`                                           |
 | Mandatory `LLM.request({ model, ... })` | Inline calls or model-free portable requests                |
 | `LLM.generate` means one turn           | `LLM.generate` means complete run                           |
 | `LLMClient.generate/stream`             | `LLM.generateTurn/streamTurn` for one turn                  |
@@ -1104,7 +1103,7 @@ These do not reopen the main design:
 3. Exact Provider definition TypeScript shape needed for strong inference
 4. Exact protocol `.with(...)` patch syntax and replacement semantics
 5. Exact Duration input fields and names
-6. Exact models.dev generation pipeline and correction-file format
+6. Exact catalog generation pipeline and correction-file format
 7. Exact cost representation and decimal arithmetic strategy
 8. Exact default retry schedule and bounded tool concurrency number
 9. Whether request-level serializable HTTP overlays belong in the stable schema

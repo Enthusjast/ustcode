@@ -43,7 +43,6 @@ import { SessionV2 } from "@enthusjast/ustcode-core/session"
 import { SessionExecution } from "@enthusjast/ustcode-core/session/execution"
 import { Skill } from "../../src/skill"
 import { SystemPrompt } from "../../src/session/system"
-import { Shell } from "@enthusjast/ustcode-core/shell"
 import { Snapshot } from "../../src/snapshot"
 import { ToolRegistry } from "@/tool/registry"
 import { Truncate } from "@/tool/truncate"
@@ -73,21 +72,7 @@ const ref = {
 }
 
 function withSh<A, E, R>(fx: () => Effect.Effect<A, E, R>) {
-  return Effect.acquireUseRelease(
-    Effect.sync(() => {
-      const prev = process.env.SHELL
-      process.env.SHELL = "/bin/sh"
-      Shell.preferred.reset()
-      return prev
-    }),
-    () => fx(),
-    (prev) =>
-      Effect.sync(() => {
-        if (prev === undefined) delete process.env.SHELL
-        else process.env.SHELL = prev
-        Shell.preferred.reset()
-      }),
-  )
+  return Effect.suspend(fx)
 }
 
 function toolPart(parts: SessionV1.Part[]) {
@@ -259,6 +244,7 @@ const unixNoLLMServer = process.platform !== "win32" ? noLLMServer.instance : no
 // Config that registers a custom "test" provider with a "test-model" model
 // so provider model lookup succeeds inside the loop.
 const cfg = {
+  shell: "sh",
   provider: {
     test: {
       name: "Test",

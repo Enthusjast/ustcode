@@ -51,10 +51,12 @@ import { EventV2Bridge } from "@/event-v2-bridge"
 import { LayerNode } from "@enthusjast/ustcode-core/effect/layer-node"
 import { AppNodeBuilderV1 } from "./app-node-builder-v1"
 import { SessionProjector } from "@enthusjast/ustcode-core/session/projector"
+import { httpClient } from "@enthusjast/ustcode-core/effect/app-node-platform"
 
 export const AppLayer = AppNodeBuilderV1.build(
   LayerNode.group([
     Npm.node,
+    httpClient,
     FSUtil.node,
     Database.node,
     Auth.node,

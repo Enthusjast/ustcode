@@ -31,11 +31,11 @@ function run(target) {
 
 const envPath = process.env.USTCODE_BIN_PATH
 const scriptDir = path.dirname(fs.realpathSync(__filename))
-const cached = path.join(scriptDir, ".lildax")
+const cached = path.join(scriptDir, ".ustcode")
 const platform = { darwin: "darwin", linux: "linux", win32: "windows" }[os.platform()] || os.platform()
 const arch = { x64: "x64", arm64: "arm64", arm: "arm" }[os.arch()] || os.arch()
 const base = "@enthusjast/ustcode-cli-" + platform + "-" + arch
-const binary = platform === "windows" ? "lildax.exe" : "lildax"
+const binary = platform === "windows" ? "ustcode.exe" : "ustcode"
 
 const names = [base]
 
@@ -57,7 +57,7 @@ function findBinary(startDir) {
 const resolved = envPath || (fs.existsSync(cached) ? cached : findBinary(scriptDir))
 if (!resolved) {
   console.error(
-    "It seems that your package manager failed to install the right lildax CLI package. Try manually installing " +
+    "It seems that your package manager failed to install the right ustcode CLI package. Try manually installing " +
       names.map((name) => `"${name}"`).join(" or ") +
       " package",
   )

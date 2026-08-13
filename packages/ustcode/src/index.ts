@@ -26,6 +26,7 @@ import { DbCommand } from "./cli/cmd/db"
 import { errorMessage } from "./util/error"
 import { PluginCommand } from "./cli/cmd/plug"
 import { Heap } from "./cli/heap"
+import { UsageCommand } from "./cli/cmd/usage"
 
 const args = hideBin(process.argv)
 
@@ -89,6 +90,7 @@ const cli = yargs(args)
   .command(ServeCommand)
   .command(ModelsCommand)
   .command(StatsCommand)
+  .command(UsageCommand)
   .command(ExportCommand)
   .command(ImportCommand)
   .command(PrCommand)

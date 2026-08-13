@@ -56,6 +56,7 @@ const TOP_LEVEL = [
 
   "models",
   "stats",
+  "usage",
   "export",
   "import",
   "pr",

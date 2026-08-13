@@ -16,6 +16,7 @@ import { useBindings } from "../keymap"
 import { useClipboard } from "../context/clipboard"
 
 const PROVIDER_PRIORITY: Record<string, number> = {
+  USTC: 0,
   ustcode: 0,
   "ustcode-go": 1,
 }
@@ -54,6 +55,7 @@ export function providerOptions(list: { id: string; name: string }[]): ProviderO
         value: provider.id,
         providerID: provider.id,
         description: {
+          USTC: "(Recommended)",
           ustcode: "(Recommended)",
           "ustcode-go": "Low cost subscription for everyone",
         }[provider.id],
@@ -366,14 +368,13 @@ function ApiMethod(props: ApiMethodProps) {
       placeholder="API key"
       description={() =>
         ({
-          ustcode: (
+          USTC: (
             <box gap={1}>
               <text fg={theme.textMuted}>
-                UstCode Zen gives you access to all the best coding models at the cheapest prices with a single API
-                key.
+                USTC provides coding models through an OpenAI-compatible API.
               </text>
               <text fg={theme.text}>
-                Go to <span style={{ fg: theme.primary }}>https://ustcode.enthusjast.cc/zen</span> to get a key
+                Set <span style={{ fg: theme.primary }}>USTC_API_KEY</span> or paste an API key to connect.
               </text>
             </box>
           ),

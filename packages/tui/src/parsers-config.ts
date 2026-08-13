@@ -1,3 +1,5 @@
+/// <reference path="./parsers.d.ts" />
+
 import { fileURLToPath } from "url"
 import clojureWasmPath from "@yogthos/tree-sitter-clojure/tree-sitter-clojure.wasm" with { type: "wasm" }
 import vueWasmPath from "@repomix/tree-sitter-wasms/out/tree-sitter-vue.wasm" with { type: "wasm" }

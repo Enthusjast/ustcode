@@ -37,7 +37,8 @@ describe("websearch provider", () => {
     expect(selectWebSearchProvider(SESSION_ID, { exa: false, parallel: true })).toBe("parallel")
   })
 
-  test("is only enabled for ustcode or explicit websearch provider flags", () => {
+  test("is enabled for USTC or explicit websearch provider flags", () => {
+    expect(webSearchEnabled(ProviderV2.ID.USTC, { exa: false, parallel: false })).toBe(true)
     expect(webSearchEnabled(ProviderV2.ID.make("ustcode"), { exa: false, parallel: false })).toBe(true)
     expect(webSearchEnabled(ProviderV2.ID.make("openai"), { exa: false, parallel: false })).toBe(false)
     expect(webSearchEnabled(ProviderV2.ID.make("openai"), { exa: true, parallel: false })).toBe(true)

@@ -57,6 +57,11 @@ export const RUN_COMMAND_PANEL_ROWS = PANEL_LIST_ROWS + PANEL_FRAME_ROWS
 const SUBAGENT_LIST_ROWS = 12
 export const RUN_SUBAGENT_PANEL_ROWS = SUBAGENT_LIST_ROWS + PANEL_FRAME_ROWS
 const PANEL_PAGE = PANEL_LIST_ROWS - 1
+
+function isUstcProvider(id: string) {
+  return id === "USTC" || id === "ustcode"
+}
+
 const PANEL_BORDER = {
   topLeft: "",
   bottomLeft: "",
@@ -966,7 +971,7 @@ export function RunModelSelectBody(props: {
             const current = props.current()?.providerID === provider.id && props.current()?.modelID === modelID
             const footer = current
               ? "current"
-              : model.cost?.input === 0 && provider.id === "ustcode"
+              : model.cost?.input === 0 && isUstcProvider(provider.id)
                 ? "Free"
                 : title !== modelID
                   ? modelID
@@ -984,7 +989,7 @@ export function RunModelSelectBody(props: {
           }),
       )
       .sort((a, b) => {
-        const provider = Number(a.providerID !== "ustcode") - Number(b.providerID !== "ustcode")
+        const provider = Number(!isUstcProvider(a.providerID)) - Number(!isUstcProvider(b.providerID))
         if (provider !== 0) {
           return provider
         }

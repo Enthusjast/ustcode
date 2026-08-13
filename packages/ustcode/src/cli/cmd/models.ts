@@ -20,14 +20,14 @@ export const ModelsCommand = effectCmd({
         type: "boolean",
       })
       .option("refresh", {
-        describe: "refresh the models cache from models.dev",
+        describe: "reload the local model catalog",
         type: "boolean",
       }),
   handler: Effect.fn("Cli.models")(function* (args) {
     const { Provider } = yield* Effect.promise(() => import("@/provider/provider"))
     if (args.refresh) {
       yield* ModelsDev.Service.use((s) => s.refresh(true))
-      UI.println(UI.Style.TEXT_SUCCESS_BOLD + "Models cache refreshed" + UI.Style.TEXT_NORMAL)
+      UI.println(UI.Style.TEXT_SUCCESS_BOLD + "Local model catalog reloaded" + UI.Style.TEXT_NORMAL)
     }
 
     const provider = yield* Provider.Service

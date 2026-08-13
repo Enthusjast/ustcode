@@ -8,6 +8,7 @@ import { statics } from "./schema"
 export const ID = Schema.String.pipe(
   Schema.brand("ProviderV2.ID"),
   statics((schema) => ({
+    USTC: schema.make("USTC"),
     ustcode: schema.make("ustcode"),
   })),
 )

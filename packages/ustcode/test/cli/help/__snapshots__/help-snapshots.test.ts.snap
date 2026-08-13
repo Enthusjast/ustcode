@@ -237,7 +237,7 @@ Options:
       --log-level   log level                   [string] [choices: "DEBUG", "INFO", "WARN", "ERROR"]
       --pure        run without external plugins                                           [boolean]
       --verbose     use more verbose model output (includes metadata like costs)           [boolean]
-      --refresh     refresh the models cache from models.dev                               [boolean]"
+      --refresh     reload the local model catalog                                         [boolean]"
 `;
 
 exports[`ustcode CLI help-text snapshots every documented command emits stable help text: ustcode stats --help 1`] = `
@@ -256,6 +256,26 @@ Options:
       --models      show model statistics (default: hidden). Pass a number to show top N, otherwise
                     shows all
       --project     filter by project (default: all projects, empty string: current project)[string]"
+`;
+
+exports[`ustcode CLI help-text snapshots every documented command emits stable help text: ustcode usage --help 1`] = `
+"ustcode usage
+
+show USTC usage, quota, and limits
+
+Options:
+  -h, --help        show help                                                              [boolean]
+  -v, --version     show version number                                                    [boolean]
+      --print-logs  print logs to stderr                                                   [boolean]
+      --log-level   log level                   [string] [choices: "DEBUG", "INFO", "WARN", "ERROR"]
+      --pure        run without external plugins                                           [boolean]
+      --start-date  start date for daily usage (YYYY-MM-DD)                                 [string]
+      --end-date    end date for daily usage (YYYY-MM-DD)                                   [string]
+      --days        number of recent calendar days when dates are omitted (default: 7)      [number]
+      --models      show usage grouped by model (pass a number to show only the top N)
+      --daily       show daily usage details                                               [boolean]
+      --keys        show all keys belonging to the account                                 [boolean]
+      --json        print sanitized JSON instead of a human-readable report                [boolean]"
 `;
 
 exports[`ustcode CLI help-text snapshots every documented command emits stable help text: ustcode export --help 1`] = `

@@ -42,7 +42,6 @@ export const Flag = {
   ),
   USTCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT:
     copy === undefined ? process.platform === "win32" : truthy("USTCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"),
-  USTCODE_MODELS_URL: process.env["USTCODE_MODELS_URL"],
   USTCODE_MODELS_PATH: process.env["USTCODE_MODELS_PATH"],
   USTCODE_DB: process.env["USTCODE_DB"],
 

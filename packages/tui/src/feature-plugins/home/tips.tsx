@@ -3,6 +3,7 @@ import type { BuiltinTuiPlugin } from "../builtins"
 import { createMemo, Show } from "solid-js"
 import { Tips } from "./tips-view"
 import { useBindings } from "../../keymap"
+import { isUstcProvider } from "../../util/provider"
 
 const id = "internal:home-tips"
 
@@ -41,7 +42,7 @@ const tui: TuiPlugin = async (api) => {
         const first = createMemo(() => api.state.session.count() === 0)
         const connected = createMemo(() =>
           api.state.provider.some(
-            (item) => item.id !== "ustcode" || Object.values(item.models).some((model) => model.cost?.input !== 0),
+            (item) => !isUstcProvider(item.id) || Object.values(item.models).some((model) => model.cost?.input !== 0),
           ),
         )
         const show = createMemo(() => (!first() || !connected()) && !hidden())
