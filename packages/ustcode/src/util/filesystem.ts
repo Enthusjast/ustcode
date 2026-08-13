@@ -161,6 +161,9 @@ export function windowsPath(p: string): string {
       .replace(/^\/cygdrive\/([a-zA-Z])(?:\/|$)/, (_, drive) => `${drive.toUpperCase()}:/`)
       // WSL paths are typically /mnt/<drive>/...
       .replace(/^\/mnt\/([a-zA-Z])(?:\/|$)/, (_, drive) => `${drive.toUpperCase()}:/`)
+      // Git Bash can omit the drive when returning a path such as `/Users/...`.
+      // Resolve that form against the Windows system drive instead of the cwd drive.
+      .replace(/^\/(?![a-zA-Z](?:[\\/]|$))/, `${process.env.SystemDrive ?? "C:"}\\`)
   )
 }
 export function overlaps(a: string, b: string) {

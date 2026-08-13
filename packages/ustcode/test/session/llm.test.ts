@@ -1,6 +1,6 @@
 import { PermissionV1 } from "@enthusjast/ustcode-core/v1/permission"
 import { ConfigV1 } from "@enthusjast/ustcode-core/v1/config/config"
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test"
+import { afterAll, beforeAll, describe, expect, test } from "bun:test"
 import { SessionV1 } from "@enthusjast/ustcode-core/v1/session"
 import path from "path"
 import { tool, type ModelMessage } from "ai"
@@ -472,12 +472,15 @@ type Capture = {
   body: Record<string, unknown>
 }
 
+type RequestMatcher = (body: Record<string, unknown>) => boolean
+
 const state = {
   server: null as ReturnType<typeof Bun.serve> | null,
   queue: [] as Array<{
     path: string
     response: Response | ((req: Request, capture: Capture) => Response)
     resolve: (value: Capture) => void
+    match?: RequestMatcher
   }>,
 }
 
@@ -489,9 +492,9 @@ function deferred<T>() {
   return result
 }
 
-function waitRequest(pathname: string, response: Response) {
+function waitRequest(pathname: string, response: Response, match?: RequestMatcher) {
   const pending = deferred<Capture>()
-  state.queue.push({ path: pathname, response, resolve: pending.resolve })
+  state.queue.push({ path: pathname, response, resolve: pending.resolve, match })
   return pending.promise
 }
 
@@ -501,7 +504,7 @@ function timeout(ms: number) {
   })
 }
 
-function waitStreamingRequest(pathname: string) {
+function waitStreamingRequest(pathname: string, match?: RequestMatcher) {
   const request = deferred<Capture>()
   const requestAborted = deferred<void>()
   const responseCanceled = deferred<void>()
@@ -510,6 +513,7 @@ function waitStreamingRequest(pathname: string) {
   state.queue.push({
     path: pathname,
     resolve: request.resolve,
+    match,
     response(req: Request) {
       req.signal.addEventListener("abort", () => requestAborted.resolve(), { once: true })
 
@@ -551,28 +555,21 @@ beforeAll(() => {
   state.server = Bun.serve({
     port: 0,
     async fetch(req) {
-      const next = state.queue.shift()
-      if (!next) {
-        return new Response("unexpected request", { status: 500 })
-      }
-
       const url = new URL(req.url)
       const body = (await req.json()) as Record<string, unknown>
-      next.resolve({ url, headers: req.headers, body })
+      const index = state.queue.findIndex(
+        (next) => url.pathname.endsWith(next.path) && (!next.match || next.match(body)),
+      )
+      const next = index === -1 ? undefined : state.queue.splice(index, 1)[0]
+      if (!next) return new Response("unexpected request", { status: 500 })
 
-      if (!url.pathname.endsWith(next.path)) {
-        return new Response("not found", { status: 404 })
-      }
+      next.resolve({ url, headers: req.headers, body })
 
       return typeof next.response === "function"
         ? next.response(req, { url, headers: req.headers, body })
         : next.response
     },
   })
-})
-
-beforeEach(() => {
-  state.queue.length = 0
 })
 
 afterAll(() => {
@@ -675,6 +672,7 @@ describe("session.llm.stream", () => {
             status: 200,
             headers: { "Content-Type": "text/event-stream" },
           }),
+          (body) => body.model === fixture.model.id,
         )
 
         const resolved = yield* Provider.use.getModel(
@@ -755,6 +753,7 @@ describe("session.llm.stream", () => {
             status: 200,
             headers: { "Content-Type": "text/event-stream" },
           }),
+          (body) => body.model === fixture.model.id,
         )
 
         const resolved = yield* Provider.use.getModel(
@@ -823,7 +822,10 @@ describe("session.llm.stream", () => {
     () =>
       Effect.gen(function* () {
         const fixture = loadFixture(alibabaQwenFixture.providerID, alibabaQwenFixture.modelID)
-        const pending = waitStreamingRequest("/chat/completions")
+        const pending = waitStreamingRequest(
+          "/chat/completions",
+          (body) => body.model === fixture.model.id && body.tools === undefined,
+        )
 
         const resolved = yield* Provider.use.getModel(
           ProviderV2.ID.make(alibabaQwenFixture.providerID),
@@ -891,6 +893,7 @@ describe("session.llm.stream", () => {
             status: 200,
             headers: { "Content-Type": "text/event-stream" },
           }),
+          (body) => body.model === fixture.model.id && body.tools !== undefined,
         )
 
         const resolved = yield* Provider.use.getModel(
@@ -1000,6 +1003,7 @@ describe("session.llm.stream", () => {
             ],
             true,
           ),
+          (body) => body.model === model.id,
         )
         const failingNativeClient = Layer.succeed(
           LLMClient.Service,
@@ -1096,7 +1100,7 @@ describe("session.llm.stream", () => {
             },
           },
         ]
-        const request = waitRequest("/responses", createEventResponse(chunks, true))
+        const request = waitRequest("/responses", createEventResponse(chunks, true), (body) => body.model === model.id)
         const image = `data:image/png;base64,${Buffer.from(
           yield* Effect.promise(() =>
             Bun.file(path.join(import.meta.dir, "../tool/fixtures/large-image.png")).arrayBuffer(),
@@ -1188,7 +1192,7 @@ describe("session.llm.stream", () => {
           },
           { type: "message_stop" },
         ]
-        const request = waitRequest("/messages", createEventResponse(chunks))
+        const request = waitRequest("/messages", createEventResponse(chunks), (body) => body.model === model.id)
 
         const resolved = yield* Provider.use.getModel(
           ProviderV2.ID.make(minimaxFixture.providerID),
