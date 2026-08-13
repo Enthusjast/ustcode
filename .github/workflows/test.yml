@@ -49,6 +49,17 @@ jobs:
       - name: Setup Bun
         uses: ./.github/actions/setup-bun
 
+      - name: Setup ripgrep (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install ripgrep --no-progress --yes
+          $ripgrepPath = Join-Path $env:ChocolateyInstall "bin"
+          if (-not (Test-Path (Join-Path $ripgrepPath "rg.exe"))) {
+            throw "Chocolatey did not install rg.exe"
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value $ripgrepPath
+
       - name: Configure git identity
         run: |
           git config --global user.email "bot@ustcode.enthusjast.cc"
