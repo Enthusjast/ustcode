@@ -1,0 +1,576 @@
+---
+title: "Commands"
+description: "Reference for the ustcode command line."
+---
+
+Every command accepts `--help` for its full flag list, for example `ustcode run --help`. Commands that talk to a server also accept `--standalone` to run a private server and `--server <url>` to target a specific one.
+
+## run
+
+Sends a message and prints the reply without opening the interactive interface.
+
+```bash
+$ ustcode run "Explain this repository"
+```
+
+### CI
+
+In CI, pass a provider API key as a secret and use standalone mode so the private server receives it. For example, this GitHub Actions job reviews the checked-out repository:
+
+```yaml
+name: USTCode review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --global @ustcode-ai/cli
+      - run: ustcode run --standalone --model anthropic/claude-sonnet-4-5 "Review this repository for correctness and summarize any issues."
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+Choose a model.
+
+```bash
+$ ustcode run --model anthropic/claude-sonnet-4-5 "Refactor parseToken"
+```
+
+Continue the last session.
+
+```bash
+$ ustcode run --continue "Now handle the expired case"
+```
+
+Emit newline-delimited JSON for scripts.
+
+```bash
+$ ustcode run --format json "List the TODO comments"
+```
+
+Attach files to the message.
+
+```bash
+$ ustcode run --file src/server.ts --file src/client.ts "Review these for bugs"
+```
+
+Run with a specific agent.
+
+```bash
+$ ustcode run --agent build "Fix the failing test"
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode run --help
+```
+
+## mini
+
+Starts the minimal interactive interface instead of the full-screen TUI.
+
+```bash
+$ ustcode mini
+```
+
+Continue the last session.
+
+```bash
+$ ustcode mini --continue
+```
+
+Start with a model and an initial prompt.
+
+```bash
+$ ustcode mini --model anthropic/claude-sonnet-4-5 --prompt "Summarize this repository"
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode mini --help
+```
+
+## session
+
+Manages sessions.
+
+```bash
+$ ustcode session list
+```
+
+Limit the list and print JSON.
+
+```bash
+$ ustcode session list --max-count 20 --format json
+```
+
+Delete a session and its child sessions.
+
+```bash
+$ ustcode session delete ses_9c1b08
+```
+
+Export session data as JSON.
+
+```bash
+$ ustcode session export ses_4f2a1c
+```
+
+Redact sensitive transcript and file data when exporting.
+
+```bash
+$ ustcode session export ses_4f2a1c --sanitize
+```
+
+Import session data from a JSON file or URL.
+
+```bash
+$ ustcode session import session.json
+```
+
+Import into a specific directory.
+
+```bash
+$ ustcode session import session.json --directory ~/code/project
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode session --help
+```
+
+## auth
+
+Manages AI providers and credentials.
+
+```bash
+$ ustcode auth list
+```
+
+List them as JSON.
+
+```bash
+$ ustcode auth list --format json
+```
+
+Log in to a provider.
+
+```bash
+$ ustcode auth login anthropic
+```
+
+Log in with a specific authentication method.
+
+```bash
+$ ustcode auth login anthropic --method api-key
+```
+
+Log out of a saved account.
+
+```bash
+$ ustcode auth logout anthropic work
+```
+
+Switch the active account for an integration.
+
+```bash
+$ ustcode auth switch anthropic work
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode auth --help
+```
+
+## models
+
+Lists every available model.
+
+```bash
+$ ustcode models
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode models --help
+```
+
+## mcp
+
+Manages MCP (Model Context Protocol) servers.
+
+```bash
+$ ustcode mcp list
+```
+
+Add a remote server.
+
+```bash
+$ ustcode mcp add context7 --url https://mcp.context7.com/mcp
+```
+
+Add a local server to the global config.
+
+```bash
+$ ustcode mcp add everything --global -- npx -y @modelcontextprotocol/server-everything
+```
+
+Add a local server with an environment variable.
+
+```bash
+$ ustcode mcp add everything --env LOG_LEVEL=debug -- npx -y @modelcontextprotocol/server-everything
+```
+
+Add a remote server with a header.
+
+```bash
+$ ustcode mcp add context7 --url https://mcp.context7.com/mcp --header CONTEXT7_API_KEY=secret
+```
+
+Authenticate with an OAuth-capable remote server.
+
+```bash
+$ ustcode mcp auth sentry
+```
+
+Remove stored OAuth credentials for a server.
+
+```bash
+$ ustcode mcp logout sentry
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode mcp --help
+```
+
+## plugin
+
+Manages plugins.
+
+```bash
+$ ustcode plugin list
+```
+
+Include built-in server plugins.
+
+```bash
+$ ustcode plugin list --builtin
+```
+
+Install a plugin and add it to the global configuration.
+
+```bash
+$ ustcode plugin add @example/ustcode-tui
+```
+
+Check package plugins for updates.
+
+```bash
+$ ustcode plugin check
+```
+
+Update package plugins.
+
+```bash
+$ ustcode plugin update
+```
+
+Remove a plugin from global configuration.
+
+```bash
+$ ustcode plugin remove @example/ustcode-tui
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode plugin --help
+```
+
+## stats
+
+Shows shareable usage statistics.
+
+```bash
+$ ustcode stats
+```
+
+Show the last 7 days.
+
+```bash
+$ ustcode stats --days 7
+```
+
+Show model usage.
+
+```bash
+$ ustcode stats --models
+```
+
+Show cost and token details.
+
+```bash
+$ ustcode stats --cost
+```
+
+Print JSON instead of a report.
+
+```bash
+$ ustcode stats --json
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode stats --help
+```
+
+## serve
+
+Starts the API and web server. See [Web](/cli/web).
+
+```bash
+$ ustcode serve
+```
+
+Bind to all interfaces on a fixed port.
+
+```bash
+$ ustcode serve --hostname 0.0.0.0 --port 4096
+```
+
+Allow a browser client from another origin.
+
+```bash
+$ ustcode serve --cors https://app.example.com
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode serve --help
+```
+
+## pair
+
+Prints one-time links, plus a QR code of the first one, that sign a browser or
+app in to the server. Links expire after 5 minutes and work once.
+
+```bash
+$ ustcode pair
+```
+
+Use an external URL in the links.
+
+```bash
+$ ustcode pair --url https://dev.example.com
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode pair --help
+```
+
+## service
+
+Manages the background server. See [Web](/cli/web).
+
+```bash
+$ ustcode service start
+```
+
+Restart it.
+
+```bash
+$ ustcode service restart
+```
+
+Show its status.
+
+```bash
+$ ustcode service status
+```
+
+Stop it.
+
+```bash
+$ ustcode service stop
+```
+
+Read a setting.
+
+```bash
+$ ustcode service get hostname
+```
+
+Set a setting.
+
+```bash
+$ ustcode service set hostname 0.0.0.0
+```
+
+Allow an extra CORS origin.
+
+```bash
+$ ustcode service set cors https://app.example.com
+```
+
+Pass an environment variable to the server process.
+
+```bash
+$ ustcode service set env USTCODE_LOG_LEVEL DEBUG
+```
+
+Reset a setting to its default.
+
+```bash
+$ ustcode service unset hostname
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode service --help
+```
+
+## reload
+
+Reloads configuration without restarting the server. Running sessions continue with fresh services at the next step boundary.
+
+```bash
+$ ustcode reload
+```
+
+## api
+
+Makes a request to the running server.
+
+```bash
+$ ustcode api GET /api/session
+```
+
+Call an operation ID with a query parameter.
+
+```bash
+$ ustcode api v2.session.list --param limit=10
+```
+
+Send a JSON body.
+
+```bash
+$ ustcode api v2.session.create --data '{"title": "New session"}'
+```
+
+Add a request header.
+
+```bash
+$ ustcode api GET /api/session -H "accept: application/json"
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode api --help
+```
+
+## acp
+
+Starts an Agent Client Protocol server over stdin and stdout for editor integrations. It runs until the client closes the connection.
+
+```bash
+$ ustcode acp
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode acp --help
+```
+
+## debug
+
+Provides debugging and troubleshooting tools.
+
+```bash
+$ ustcode debug agents
+```
+
+List configuration sources.
+
+```bash
+$ ustcode debug config
+```
+
+Show global paths.
+
+```bash
+$ ustcode debug paths
+```
+
+Print a single path.
+
+```bash
+$ ustcode debug paths db
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode debug --help
+```
+
+## upgrade
+
+Upgrades USTCode to the latest or a specific version. Alias: `update`.
+
+```bash
+$ ustcode upgrade
+```
+
+Upgrade to a specific version with a specific package manager.
+
+```bash
+$ ustcode upgrade 1.18.15 --method bun
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode upgrade --help
+```
+
+## uninstall
+
+Removes USTCode and all related files.
+
+```bash
+$ ustcode uninstall
+```
+
+Preview what would be removed.
+
+```bash
+$ ustcode uninstall --dry-run
+```
+
+Keep configuration and session data.
+
+```bash
+$ ustcode uninstall --keep-config --keep-data
+```
+
+View all subcommands and flags.
+
+```bash
+$ ustcode uninstall --help
+```

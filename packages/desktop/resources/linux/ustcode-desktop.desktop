@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=USTCode
+Exec=/opt/ustcode/ai.ustcode.desktop %U
+Terminal=false
+Type=Application
+Icon=ai.ustcode.desktop
+StartupWMClass=ai.ustcode.desktop
+NoDisplay=true
+Comment=Open source AI coding agent
+Categories=Development;

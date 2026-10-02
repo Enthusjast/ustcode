@@ -1,0 +1,134 @@
+---
+title: 模型
+description: 在 USTCode 中选择和配置内置或自定义模型。
+---
+
+USTCode 内置 **USTC TokenWorks** 和 **USTC TokenPlan** 两个模型提供商。配置自定义提供商后，也可以使用其他服务的模型。详见[提供商](/docs/providers)。
+
+## 选择模型
+
+### USTC TokenWorks
+
+在**设置 → 提供商**中连接 USTC TokenWorks，也可以运行 `ustcode auth login` 并选择它。完成浏览器登录后，USTCode 会加载当前授权的模型目录；本机回调要求 USTCode 服务端和浏览器运行在同一台机器上，不需要设置 API Key 环境变量。
+
+运行 `/models` 选择模型。模型 ID 由服务端提供，可能变化；完整 ID 格式为 `ustc-tokenworks/<model-id>`。登录不会替换已有模型选择或配置默认值。
+
+### USTC TokenPlan
+
+在运行模型请求的 USTCode 服务端设置 `USTC_TOKENPLAN_API_KEY`，然后运行 `/models` 选择 TokenPlan 模型：
+
+```bash
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+```text
+/models
+```
+
+内置模型 ID：
+
+- `qwen-chat`
+- `qwen-reasoner`
+- `qwen3.5`
+- `qwen3.5-thinking`
+- `qwen3.5-non-thinking`
+- `claude-haiku-4-5`
+- `claude-haiku-4-5-20251001`
+- `claude-sonnet-4-6`
+- `deepseek-v4-flash-ascend`
+- `deepseek-v4-flash-ascend1`
+- `smart/reasoning`
+- `smart/default`
+- `qwen3.8-reasoner`
+- `qwen3.8-flash-next`
+- `qwen3.8-flash-next-2`
+- `qwen3.8-chat`
+- `unlimited-ocr`
+- `deepseek-flash-2`
+- `glm-5.3-flash`
+- `deepseek-flash`
+
+所有模型均配置为支持推理和工具调用。网关未声明大多数模型的上下文/输出限制，因此 USTCode 使用 128K/16K 的回退值。`smart/default` 使用较保守的 128K/8K 限制，因为观测到的一个后端输出上限为 8K，而该别名会路由到多个后端。只有 `qwen3.8-flash-next-2` 有网关明确声明的图像输入能力；未声明的模态按纯文本处理。`claude-*` 是网关别名，不代表原生 Anthropic 后端。TokenPlan 输入/输出价格来自网关每 token 费率并换算为每百万 token 价格；多部署别名采用已观察到的最高费率。由于网关未声明币种，目录金额仅供参考，实际扣费以 `/key/spend/report` 为准。
+
+## 模型 ID 和默认值
+
+完整模型 ID 格式为 `provider-id/model-id`，例如 `ustc-tokenplan/qwen-chat`。在 `ustcode.json` 或
+`ustcode.jsonc` 中设置 `model`，为新任务指定默认模型：
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "model": "ustc-tokenplan/qwen-chat",
+}
+```
+
+TokenPlan 不会单独指定默认模型。如果没有配置默认值，USTCode 仍沿用现有的默认模型回退规则。会话已选模型的优先级高于配置中的默认值。
+
+也可以为单次 CLI 运行指定模型：
+
+```bash
+ustcode run --model ustc-tokenplan/qwen3.8-reasoner#high "Review this change"
+```
+
+## 变体和请求选项
+
+变体用于选择命名模型设置，例如推理强度。TokenPlan 模型提供 `low`、`medium` 和 `high` 强度变体，可在模型 ID 后添加 `#variant` 选择。
+
+提供商、模型和变体配置可以设置 `settings`、`headers` 和 `body`。具体选项取决于运行时适配器，应用顺序依次为提供商、模型、变体。
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "ustc-tokenplan": {
+      "models": {
+        "qwen3.8-reasoner": {
+          "settings": {
+            "reasoningEffort": "high",
+          },
+          "headers": {
+            "X-Model-Tier": "coding",
+          },
+          "body": {
+            "store": false,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+## 自定义模型
+
+可以在自定义提供商下定义其他模型，并按 API 实际能力填写限制：
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "acme": {
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "coder": {
+          "modelID": "upstream-coder-v2",
+          "capabilities": {
+            "tools": true,
+            "input": ["text"],
+            "output": ["text"],
+          },
+          "limit": {
+            "context": 128000,
+            "output": 16000,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+可选择的模型 ID 是 `acme/coder`；发送给服务端的模型 ID 由 `modelID` 指定。自定义提供商选项详见[提供商](/docs/providers)。

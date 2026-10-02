@@ -1,0 +1,152 @@
+---
+title: "Providers"
+---
+
+USTCode ships with one built-in model provider: **USTC TokenPlan**. The model catalog is bundled with USTCode. Other
+services are available only when you add them explicitly as custom providers.
+
+## USTC TokenPlan
+
+- Base URL: `https://api.llm.ustc.edu.cn/v1`
+- API key environment variable: `USTC_TOKENPLAN_API_KEY`
+- Models: `qwen3.5`, `qwen-chat`, `qwen-reasoner`, `claude-haiku-4-5`, `qwen3.5-thinking`, `claude-sonnet-4-6`,
+  `qwen3.5-non-thinking`, `deepseek-v4-flash-ascend`, `claude-haiku-4-5-20251001`, `smart/default`,
+  `qwen3.8-reasoner`, `qwen3.8-flash-next`, `smart/reasoning`, `unlimited-ocr`, `deepseek-v4-flash-ascend1`,
+  `qwen3.8-flash-next-2`, `qwen3.8-chat`, `deepseek-flash-2`, `glm-5.3-flash`, and `deepseek-flash`.
+
+Reasoning and tool calling are enabled for all listed models. The gateway does not declare context/output limits for most
+models, so USTCode uses 128K/16K fallbacks. `smart/default` uses a conservative 128K/8K limit because one observed
+deployment reports an 8K output limit while the alias can route to multiple deployments. Only `qwen3.8-flash-next-2`
+has gateway-declared image input support; undeclared modalities remain text-only in the catalog. The `claude-*` IDs are
+gateway aliases and may route to Qwen or DeepSeek backends; they do not imply native Anthropic models.
+
+TokenPlan does not bill users per token, so catalog costs remain zero. The gateway's raw per-token cost fields have no
+declared currency and vary by deployment, so USTCode does not present them as user prices. No provider-specific default
+is pinned; when a default is needed, USTCode's normal model-resolution behavior applies.
+
+Set the API key in the environment of the USTCode server, or use `/connect` to enter it. Then select a model with
+`/models` or use a full model ID such as `ustc-tokenplan/qwen-chat`.
+
+```bash
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+## Custom providers
+
+Define another service in `ustcode.jsonc`. This OpenAI-compatible example specifies its credential, runtime package,
+endpoint, and model:
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "providers": {
+    "acme": {
+      "name": "Acme",
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "qwen3-coder": {
+          "name": "Qwen 3 Coder",
+        },
+      },
+    },
+  },
+}
+```
+
+The `providers` object is keyed by the provider ID in model references, for example `acme/qwen3-coder`.
+
+| Field | Purpose |
+| --- | --- |
+| `name` | Display name. |
+| `env` | Environment variable names used for credentials. |
+| `package` | Runtime adapter package. |
+| `canonical` | Optional built-in model metadata to inherit; `ustc-tokenplan` is the only built-in catalog provider. |
+| `settings` | Provider controls and package-specific options, such as `baseURL`. |
+| `headers` | String-valued HTTP headers added to requests. |
+| `body` | JSON fields merged into request bodies. |
+| `models` | Models to add or override, keyed by the USTCode model ID. |
+
+### Endpoint and request options
+
+`settings` is package-specific. Use `settings.baseURL` for a custom endpoint or proxy. Use `headers` and `body` for
+request-wide overrides; model and variant entries can override them for narrower cases.
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "acme": {
+      "headers": {
+        "X-Gateway-Tenant": "engineering",
+      },
+      "body": {
+        "metadata": {
+          "application": "ustcode",
+        },
+      },
+    },
+  },
+}
+```
+
+### Runtime packages
+
+The following `@ustcode-ai/ai` packages can be selected explicitly for custom provider definitions. They are runtime
+adapters, not additional providers registered in the built-in catalog.
+
+- `@ustcode-ai/ai/providers/openai`
+- `@ustcode-ai/ai/providers/openai/chat`
+- `@ustcode-ai/ai/providers/openai/responses`
+- `@ustcode-ai/ai/providers/openai-compatible`
+- `@ustcode-ai/ai/providers/openai-compatible/responses`
+- `@ustcode-ai/ai/providers/anthropic`
+- `@ustcode-ai/ai/providers/anthropic-compatible`
+- `@ustcode-ai/ai/providers/google`
+- `@ustcode-ai/ai/providers/google-vertex`
+- `@ustcode-ai/ai/providers/google-vertex/gemini`
+- `@ustcode-ai/ai/providers/google-vertex/chat`
+- `@ustcode-ai/ai/providers/google-vertex/responses`
+- `@ustcode-ai/ai/providers/google-vertex/messages`
+- `@ustcode-ai/ai/providers/azure`
+- `@ustcode-ai/ai/providers/azure/chat`
+- `@ustcode-ai/ai/providers/azure/responses`
+- `@ustcode-ai/ai/providers/amazon-bedrock`
+- `@ustcode-ai/ai/providers/amazon-bedrock/mantle`
+- `@ustcode-ai/ai/providers/amazon-bedrock/mantle/chat`
+- `@ustcode-ai/ai/providers/amazon-bedrock/mantle/responses`
+- `@ustcode-ai/ai/providers/openrouter`
+- `@ustcode-ai/ai/providers/xai`
+
+You can also select an npm package such as `@acme/ustcode-provider` or a local package URL. Custom provider package
+loading remains available.
+
+### Models
+
+Add or override models in a provider's `models` map. The map key is the USTCode model ID; `modelID` changes the ID sent
+to the API.
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "acme": {
+      "models": {
+        "coding": {
+          "modelID": "upstream-coder-v2",
+          "name": "Coding model",
+          "limit": {
+            "context": 128000,
+            "output": 16000,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+Model fields include `modelID`, `name`, `family`, `package`, `settings`, `headers`, `body`, `capabilities`,
+`compatibility`, `variants`, `cost`, `limit`, and `disabled`. See [Models](/models) for selection and model behavior.

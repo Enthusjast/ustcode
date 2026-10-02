@@ -1,0 +1,31 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "ustcode-update",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-07-21",
+	"workers_dev": false,
+	"preview_urls": false,
+	"routes": [
+		{
+			"pattern": "update.ustcode.enthusjast.cc",
+			"custom_domain": true,
+		},
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "ustcode-update",
+			// Create this database in the USTCode Cloudflare account before deployment.
+			"database_id": "REPLACE_WITH_USTCODE_UPDATE_DATABASE_ID",
+			"migrations_dir": "migrations",
+		},
+		{
+			"binding": "ustcode_update",
+			"database_name": "ustcode-update",
+			"database_id": "06dd47c5-f6a9-4d2f-9bc6-9087a2f1deb5"
+		},
+	],
+	"observability": {
+		"enabled": true,
+	},
+}

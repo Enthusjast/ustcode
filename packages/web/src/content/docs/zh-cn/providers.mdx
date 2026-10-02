@@ -1,0 +1,62 @@
+---
+title: 提供商
+description: 登录 USTC TokenWorks、配置 USTC TokenPlan，或添加自定义 LLM 提供商。
+---
+
+USTCode 内置两个科大模型提供商：**USTC TokenWorks** 和 **USTC TokenPlan**。其他模型服务可以通过自定义提供商配置显式添加。
+
+## USTC TokenWorks
+
+在**设置 → 提供商 → USTC TokenWorks** 中连接，也可以运行 `ustcode auth login` 并选择该提供商。USTCode 会在系统浏览器中打开科大登录页面，并通过本机回调完成 OIDC 授权；USTCode 服务端和浏览器必须运行在同一台机器上。
+
+此方式不需要 API Key 或环境变量。登录后，USTCode 从科大 bootstrap 服务获取网关 Key 和当前模型目录。Key 仅保留在服务端内存中，不写入 Provider 配置，也不会返回给客户端。模型列表及其声明的限制、模态、工具调用和推理能力会随服务端目录变化。未声明上下文/输出限制时使用 262K/32K 回退值；未声明能力的模型按纯文本处理。
+
+该提供商使用科大 OpenAI 兼容 Chat Completions 网关。运行 `/models` 选择可用模型，完整 ID 格式为 `ustc-tokenworks/<model-id>`。连接 TokenWorks 不会更改已配置或之前选择的默认模型。
+
+<span id="directory"></span>
+## USTC TokenPlan
+
+- Base URL：`https://api.llm.ustc.edu.cn/v1`
+- API Key 环境变量：`USTC_TOKENPLAN_API_KEY`
+- 可用模型：`qwen3.5`, `qwen-chat`, `qwen-reasoner`, `claude-haiku-4-5`, `qwen3.5-thinking`, `claude-sonnet-4-6`, `qwen3.5-non-thinking`, `deepseek-v4-flash-ascend`, `claude-haiku-4-5-20251001`, `smart/default`, `qwen3.8-reasoner`, `qwen3.8-flash-next`, `smart/reasoning`, `unlimited-ocr`, `deepseek-v4-flash-ascend1`, `qwen3.8-flash-next-2`, `qwen3.8-chat`, `deepseek-flash-2`, `glm-5.3-flash`, `deepseek-flash`.
+
+所有模型仍配置为支持推理和工具调用。网关未声明大多数模型的上下文/输出限制，因此 USTCode 使用 128K/16K 回退；`smart/default` 保守使用 128K/8K。只有 `qwen3.8-flash-next-2` 有网关明确声明的图像输入能力，其他未声明模态按纯文本处理。目录中的输入/输出价格来自网关每 token 费率，并换算为每百万 token 价格；同一别名对应多个部署费率时采用已观察到的最高值，避免低估。网关未声明币种，因此这些价格仅供参考，实际扣费以 `/key/spend/report` 为准。`claude-*` 是网关别名，不代表原生 Anthropic 模型。
+
+启动 USTCode 前设置 API Key：
+
+```sh
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+运行 `/models` 选择模型，也可以在配置中使用完整模型 ID，例如 `ustc-tokenplan/qwen-chat`。
+
+<span id="custom"></span>
+<span id="authentication-precedence"></span>
+<span id="amazon-bedrock"></span>
+## 自定义提供商
+
+可以在 `ustcode.jsonc` 中配置其他服务。下面以 OpenAI Chat Completions 兼容接口为例，使用通用适配器：
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "providers": {
+    "acme": {
+      "name": "Acme",
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "example-model": {
+          "name": "Example Model",
+        },
+      },
+    },
+  },
+}
+```
+
+该自定义模型的完整 ID 是 `acme/example-model`。已有自定义提供商配置和凭据不会被任何内置目录覆盖或删除。

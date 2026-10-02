@@ -1,0 +1,80 @@
+---
+title: Ecosystem
+description: Projects and integrations built with USTCode.
+---
+
+A collection of community projects built on USTCode.
+
+:::note
+Want to add your USTCode related project to this list? Submit a PR.
+:::
+
+You can also check out [awesome-ustcode](https://github.com/awesome-ustcode/awesome-ustcode) and [ustcode.cafe](https://ustcode.cafe), a community that aggregates the ecosystem and community.
+
+---
+
+## Plugins
+
+| Name                                                                                               | Description                                                                                        |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [ustcode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/ustcode-plugin)            | Automatically run USTCode sessions in isolated Daytona sandboxes with git sync and live previews  |
+| [ustcode-helicone-session](https://github.com/H2Shami/ustcode-helicone-session)                  | Automatically inject Helicone session headers for request grouping                                 |
+| [ustcode-type-inject](https://github.com/nick-vi/ustcode-type-inject)                            | Auto-inject TypeScript/Svelte types into file reads with lookup tools                              |
+| [ustcode-openai-codex-auth](https://github.com/numman-ali/ustcode-openai-codex-auth)             | Use your ChatGPT Plus/Pro subscription instead of API credits                                      |
+| [ustcode-gemini-auth](https://github.com/jenslys/ustcode-gemini-auth)                            | Use your existing Gemini plan instead of API billing                                               |
+| [ustcode-antigravity-auth](https://github.com/NoeFabris/ustcode-antigravity-auth)                | Use Antigravity's free models instead of API billing                                               |
+| [ustcode-devcontainers](https://github.com/athal7/ustcode-devcontainers)                         | Multi-branch devcontainer isolation with shallow clones and auto-assigned ports                    |
+| [ustcode-dynamic-context-pruning](https://github.com/Tarquinen/ustcode-dynamic-context-pruning)  | Optimize token usage by pruning obsolete tool outputs                                              |
+| [ustcode-vibeguard](https://github.com/inkdust2021/ustcode-vibeguard)                            | Redact secrets/PII into VibeGuard-style placeholders before LLM calls; restore locally             |
+| [ustcode-websearch-cited](https://github.com/ghoulr/ustcode-websearch-cited.git)                 | Add native websearch support for supported providers with Google grounded style                    |
+| [ustcode-pty](https://github.com/shekohex/ustcode-pty.git)                                       | Enables AI agents to run background processes in a PTY, send interactive input to them.            |
+| [ustcode-shell-strategy](https://github.com/JRedeker/ustcode-shell-strategy)                     | Instructions for non-interactive shell commands - prevents hangs from TTY-dependent operations     |
+| [ustcode-wakatime](https://github.com/angristan/ustcode-wakatime)                                | Track USTCode usage with Wakatime                                                                 |
+| [ustcode-md-table-formatter](https://github.com/franlol/ustcode-md-table-formatter/tree/main)    | Clean up markdown tables produced by LLMs                                                          |
+| [ustcode-morph-fast-apply](https://github.com/JRedeker/ustcode-morph-fast-apply)                 | 10x faster code editing with Morph Fast Apply API and lazy edit markers                            |
+| [ustcode-morph-plugin](https://github.com/morphllm/ustcode-morph-plugin)                         | Fast Apply editing, WarpGrep codebase search, and context compaction via Morph                     |
+| [oh-my-ustcode](https://github.com/code-yeongyu/oh-my-ustcode)                                   | Background agents, pre-built LSP/AST/MCP tools, curated agents, Claude Code compatible             |
+| [ustcode-notificator](https://github.com/panta82/ustcode-notificator)                            | Desktop notifications and sound alerts for USTCode sessions                                       |
+| [ustcode-notifier](https://github.com/mohak34/ustcode-notifier)                                  | Desktop notifications and sound alerts for permission, completion, and error events                |
+| [ustcode-zellij-namer](https://github.com/24601/ustcode-zellij-namer)                            | AI-powered automatic Zellij session naming based on USTCode context                               |
+| [ustcode-skillful](https://github.com/zenobi-us/ustcode-skillful)                                | Allow USTCode agents to lazy load prompts on demand with skill discovery and injection            |
+| [ustcode-supermemory](https://github.com/supermemoryai/ustcode-supermemory)                      | Persistent memory across sessions using Supermemory                                                |
+| [@plannotator/ustcode](https://github.com/backnotprop/plannotator/tree/main/apps/ustcode-plugin) | Interactive plan review with visual annotation and private/offline sharing                         |
+| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | Extend ustcode /commands into a powerful orchestration system with granular flow control          |
+| [ustcode-scheduler](https://github.com/different-ai/ustcode-scheduler)                           | Schedule recurring jobs using launchd (Mac) or systemd (Linux) with cron syntax                    |
+| [ustcode-conductor](https://github.com/derekbar90/ustcode-conductor)                             | Protocol-Driven Workflow: Automation of the Context -> Spec -> Plan -> Implement lifecycle.        |
+| [micode](https://github.com/vtemian/micode)                                                        | Structured Brainstorm → Plan → Implement workflow with session continuity                          |
+| [octto](https://github.com/vtemian/octto)                                                          | Interactive browser UI for AI brainstorming with multi-question forms                              |
+| [ustcode-background-agents](https://github.com/kdcokenny/ustcode-background-agents)              | Claude Code-style background agents with async delegation and context persistence                  |
+| [ustcode-notify](https://github.com/kdcokenny/ustcode-notify)                                    | Native OS notifications for USTCode – know when tasks complete                                    |
+| [ustcode-workspace](https://github.com/kdcokenny/ustcode-workspace)                              | Bundled multi-agent orchestration harness – 16 components, one install                             |
+| [ustcode-worktree](https://github.com/kdcokenny/ustcode-worktree)                                | Zero-friction git worktrees for USTCode                                                           |
+| [ustcode-sentry-monitor](https://github.com/stolinski/ustcode-sentry-monitor)                    | Trace and debug your AI agents with Sentry AI Monitoring                                           |
+| [ustcode-jfrog-plugin](https://github.com/jfrog/ustcode-jfrog-plugin)                            | JFrog Plugin for seamless integration of USTCode users to JFrog platform                          |
+
+---
+
+## Projects
+
+| Name                                                                                       | Description                                                      |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| [kimaki](https://github.com/remorses/kimaki)                                               | Discord bot to control USTCode sessions, built on the SDK       |
+| [ustcode.nvim](https://github.com/NickvanDyke/ustcode.nvim)                              | Neovim plugin for editor-aware prompts, built on the API         |
+| [portal](https://github.com/hosenur/portal)                                                | Mobile-first web UI for USTCode over Tailscale/VPN              |
+| [ustcode plugin template](https://github.com/zenobi-us/ustcode-plugin-template/)         | Template for building USTCode plugins                           |
+| [ustcode.nvim](https://github.com/sudo-tee/ustcode.nvim)                                 | Neovim frontend for ustcode - a terminal-based AI coding agent  |
+| [ai-sdk-provider-ustcode-sdk](https://github.com/ben-vargas/ai-sdk-provider-ustcode-sdk) | Vercel AI SDK provider for using USTCode via @ustcode-ai/sdk   |
+| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | Web / Desktop App and VS Code Extension for USTCode             |
+| [USTCode-Obsidian](https://github.com/mtymek/ustcode-obsidian)                           | Obsidian plugin that embeds USTCode in Obsidian's UI            |
+| [OpenWork](https://github.com/different-ai/openwork)                                       | An open-source alternative to Claude Cowork, powered by USTCode |
+| [ocx](https://github.com/kdcokenny/ocx)                                                    | USTCode extension manager with portable, isolated profiles.     |
+| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | Desktop, Web, Mobile and Remote Client App for USTCode          |
+
+---
+
+## Agents
+
+| Name                                                              | Description                                                  |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Agentic](https://github.com/Cluster444/agentic)                  | Modular AI agents and commands for structured development    |
+| [ustcode-agents](https://github.com/darrenhinde/ustcode-agents) | Configs, prompts, agents, and plugins for enhanced workflows |

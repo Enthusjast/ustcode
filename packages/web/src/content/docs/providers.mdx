@@ -1,0 +1,69 @@
+---
+title: Providers
+description: Connect to USTC TokenWorks or TokenPlan, or add a custom LLM provider.
+---
+
+USTCode includes two built-in USTC model providers: **USTC TokenWorks** and **USTC TokenPlan**. Other model services can be added explicitly as custom providers.
+
+## USTC TokenWorks
+
+Connect from **Settings → Providers → USTC TokenWorks**, or run `ustcode auth login` and select the provider. USTCode opens the USTC sign-in page in your browser and completes OIDC authorization through a loopback callback; the USTCode server and browser must run on the same machine.
+
+No API key or environment variable is required. After sign-in, USTCode requests the gateway key and current model catalog from the USTC bootstrap service. The key remains in server memory and is not stored in Provider configuration or exposed to the client. Models and their declared limits, modalities, tool support, and reasoning options can change as the service catalog changes. Missing limits use 262K context / 32K output fallbacks; undeclared capabilities are treated as text-only.
+
+The provider uses the USTC OpenAI-compatible Chat Completions gateway. Choose an available model with `/models`; its full ID has the form `ustc-tokenworks/<model-id>`. Connecting TokenWorks does not change your configured or previously selected default model.
+
+<span id="directory"></span>
+## USTC TokenPlan
+
+- Base URL: `https://api.llm.ustc.edu.cn/v1`
+- API key environment variable: `USTC_TOKENPLAN_API_KEY`
+- Models: `qwen3.5`, `qwen-chat`, `qwen-reasoner`, `claude-haiku-4-5`, `qwen3.5-thinking`, `claude-sonnet-4-6`, `qwen3.5-non-thinking`, `deepseek-v4-flash-ascend`, `claude-haiku-4-5-20251001`, `smart/default`, `qwen3.8-reasoner`, `qwen3.8-flash-next`, `smart/reasoning`, `unlimited-ocr`, `deepseek-v4-flash-ascend1`, `qwen3.8-flash-next-2`, `qwen3.8-chat`, `deepseek-flash-2`, `glm-5.3-flash`, `deepseek-flash`.
+
+All listed models have reasoning and tool calling enabled. The gateway does not declare context/output limits for most
+models, so USTCode uses 128K/16K fallbacks; `smart/default` uses a conservative 128K/8K because one observed backend
+has an 8K output limit. Only `qwen3.8-flash-next-2` has gateway-declared image input support; undeclared modalities are
+treated as text. The `claude-*` IDs are gateway aliases, not claims of native Anthropic models. Input/output prices are
+converted from the gateway's per-token rates to USTCode's per-million-token catalog values. The highest observed rate
+is used for aliases with multiple deployments to avoid understating cost. Currency is not declared by the gateway, so
+these figures are indicative; `/key/spend/report` is the source of truth for actual billing. No TokenPlan-specific
+default is pinned; USTCode's normal fallback applies when a default is needed.
+
+Set the API key before starting USTCode:
+
+```sh
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+Select a model with `/models`, or set its full ID in configuration, for example `ustc-tokenplan/qwen-chat`.
+
+<span id="custom"></span>
+<span id="authentication-precedence"></span>
+<span id="amazon-bedrock"></span>
+## Custom providers
+
+You can keep using another service by defining it in `ustcode.jsonc`. This example connects an OpenAI-compatible API using the generic adapter:
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "providers": {
+    "acme": {
+      "name": "Acme",
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "example-model": {
+          "name": "Example Model",
+        },
+      },
+    },
+  },
+}
+```
+
+The custom model ID is `acme/example-model`. The configured `package` selects the runtime adapter; `settings.baseURL` points it to the service endpoint. Existing custom provider configuration and credentials are not replaced by either built-in catalog.

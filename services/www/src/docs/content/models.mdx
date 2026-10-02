@@ -1,0 +1,139 @@
+---
+title: "Models"
+---
+
+Choose a model for the current session with `/models`:
+
+```text
+/models
+```
+
+The built-in catalog contains USTC TokenPlan. Models from custom providers appear when those providers are configured
+and available in the current project. See [Providers](/providers).
+
+## Model IDs
+
+A model reference uses `provider-id/model-id`, optionally followed by a variant:
+
+```text
+ustc-tokenplan/qwen-chat
+ustc-tokenplan/qwen3.8-reasoner#high
+```
+
+The provider and model IDs are case-sensitive. The selector shows enabled models whose provider is available in the
+current project.
+
+Use `--model` to select a model for one CLI run without changing the configured default:
+
+```bash
+ustcode run --model ustc-tokenplan/qwen-chat "Refactor parseToken"
+```
+
+## Defaults
+
+Set `model` in `ustcode.json` or `ustcode.jsonc` to choose a default for new work:
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "model": "ustc-tokenplan/qwen-chat",
+}
+```
+
+USTC TokenPlan does not pin a provider-specific default. When no default is configured, USTCode retains its existing
+fallback model-resolution behavior. A model already selected for a session takes precedence over the configured
+default, and changing a session's model does not rewrite the config file.
+
+## Variants
+
+Variants are named options for a model, commonly used to select reasoning effort. Use `#variant` in a model reference:
+
+```bash
+ustcode run --model ustc-tokenplan/qwen3.8-reasoner#high "Review this migration plan"
+```
+
+Variant names depend on the model. USTC TokenPlan models expose `low`, `medium`, and `high` reasoning-effort variants.
+You can define additional variants in the model's configuration:
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "ustc-tokenplan": {
+      "models": {
+        "qwen3.8-reasoner": {
+          "variants": [
+            {
+              "id": "fast",
+              "settings": {
+                "reasoningEffort": "low",
+              },
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+```
+
+Each variant can contain `settings`, `headers`, and `body`. Its values are applied after provider- and model-level values.
+
+## Model configuration
+
+Provider and model entries can customize requests with `settings`, `headers`, and `body`. The exact `settings` are
+runtime-package-specific.
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "ustc-tokenplan": {
+      "headers": {
+        "X-Team": "platform",
+      },
+      "models": {
+        "qwen3.8-reasoner": {
+          "settings": {
+            "reasoningEffort": "high",
+          },
+          "body": {
+            "store": false,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+Add a custom model by defining it under a configured provider. Set accurate capabilities and limits when the API model
+differs from the normal custom-model fallback values:
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "acme": {
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "coder": {
+          "modelID": "upstream-coder-v2",
+          "capabilities": {
+            "tools": true,
+            "input": ["text"],
+            "output": ["text"],
+          },
+          "limit": {
+            "context": 128000,
+            "output": 16000,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+See [Providers](/providers) for custom provider fields and runtime packages.

@@ -1,0 +1,146 @@
+{
+  lib,
+  stdenv,
+  bun,
+  nodejs,
+  darwin,
+  callPackage,
+  makeWrapper,
+  writableTmpDirAsHomeHook,
+  autoPatchelfHook,
+  copyDesktopItems,
+  makeDesktopItem,
+  ustcode,
+}:
+let
+  electron = callPackage ./electron.nix { };
+in
+stdenv.mkDerivation (finalAttrs: {
+  pname = "ustcode-desktop";
+  inherit (ustcode)
+    version
+    src
+    node_modules
+    patches
+    ;
+
+  nativeBuildInputs = [
+    bun
+    nodejs
+    makeWrapper
+    writableTmpDirAsHomeHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    autoPatchelfHook
+    copyDesktopItems
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # Ad-hoc sign the .app: --config.mac.identity=null below skips signing.
+    darwin.autoSignDarwinBinariesHook
+  ];
+
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    (lib.getLib stdenv.cc.cc)
+  ];
+
+  desktopItems = lib.optional stdenv.hostPlatform.isLinux (makeDesktopItem {
+    name = "ai.ustcode.desktop";
+    desktopName = "USTCode";
+    exec = "ustcode-desktop %U";
+    icon = "ai.ustcode.desktop";
+    # Electron derives X11 WM_CLASS from app.name.
+    startupWMClass = "USTCode";
+    categories = [ "Development" ];
+  });
+
+  env = ustcode.env // {
+    ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
+  };
+
+  postPatch =
+    # NOTE: Relax Bun version check to be a warning instead of an error
+    ''
+      substituteInPlace packages/script/src/index.ts \
+        --replace-fail 'throw new Error(`This script requires bun@''${expectedBunVersionRange}' \
+                       'console.warn(`Warning: This script requires bun@''${expectedBunVersionRange}'
+    ''
+    # https://github.com/electron/electron/issues/31121
+    # mac builds use a .app bundle which doesnt have this issue
+    + lib.optionalString stdenv.isLinux ''
+      substituteInPlace \
+        packages/desktop/src/main/windows/appearance.ts \
+        packages/desktop/src/main/service/desktop-cli.ts \
+        --replace-fail "process.resourcesPath" "'$out/opt/ustcode-desktop/resources'"
+    '';
+
+  preBuild = ''
+    cp -r "${electron.dist}" $HOME/.electron-dist
+    chmod -R u+w $HOME/.electron-dist
+
+    cp -R ${finalAttrs.node_modules}/. .
+    patchShebangs node_modules
+    patchShebangs packages/*/node_modules
+  '';
+
+  buildPhase = ''
+    runHook preBuild
+
+    cd packages/desktop
+
+    export USTCODE_CLI_DIST="$TMPDIR/desktop-cli"
+    cli_package=$(bun -e 'import { getCurrentCli } from "./scripts/utils.ts"; console.log(getCurrentCli().package.replace("@ustcode-ai/", ""))')
+    mkdir -p "$USTCODE_CLI_DIST/$cli_package/bin"
+    cp ${lib.getExe ustcode} "$USTCODE_CLI_DIST/$cli_package/bin/ustcode"
+
+    bun run build
+    npx electron-builder --dir \
+      --config electron-builder.config.ts \
+      --config.mac.identity=null \
+      --config.electronDist="$HOME/.electron-dist"
+
+    runHook postBuild
+  '';
+
+  installPhase = ''
+    runHook preInstall
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    mkdir -p $out/Applications
+    mv dist/mac*/*.app $out/Applications
+    makeWrapper "$out/Applications/USTCode.app/Contents/MacOS/USTCode" $out/bin/ustcode-desktop
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    mkdir -p $out/opt/ustcode-desktop
+    cp -r dist/linux*-unpacked/{resources,LICENSE*} $out/opt/ustcode-desktop
+    install -Dm644 resources/icons/32x32.png \
+      "$out/share/icons/hicolor/32x32/apps/ai.ustcode.desktop.png"
+    install -Dm644 resources/icons/64x64.png \
+      "$out/share/icons/hicolor/64x64/apps/ai.ustcode.desktop.png"
+    install -Dm644 resources/icons/128x128.png \
+      "$out/share/icons/hicolor/128x128/apps/ai.ustcode.desktop.png"
+    install -Dm644 resources/icons/128x128@2x.png \
+      "$out/share/icons/hicolor/256x256/apps/ai.ustcode.desktop.png"
+    install -Dm644 resources/icons/icon.png \
+      "$out/share/icons/hicolor/512x512/apps/ai.ustcode.desktop.png"
+    install -Dm644 resources/ai.ustcode.desktop.metainfo.xml \
+      "$out/share/metainfo/ai.ustcode.desktop.metainfo.xml"
+    makeWrapper ${lib.getExe electron} $out/bin/ustcode-desktop \
+     --inherit-argv0 \
+     --set ELECTRON_FORCE_IS_PACKAGED 1 \
+     --add-flags $out/opt/ustcode-desktop/resources/app.asar \
+     --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
+  ''
+  + ''
+    runHook postInstall
+  '';
+
+  autoPatchelfIgnoreMissingDeps = [
+    "libc.musl-x86_64.so.1"
+  ];
+
+  meta = {
+    description = "USTCode Desktop App";
+    mainProgram = "ustcode-desktop";
+    inherit (ustcode.meta) homepage license platforms;
+  };
+})

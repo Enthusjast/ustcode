@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ustcode-posts",
+  "compatibility_date": "2026-07-25",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "ustcode.enthusjast.cc/posts*",
+      "zone_name": "ustcode.enthusjast.cc"
+    }
+  ]
+}

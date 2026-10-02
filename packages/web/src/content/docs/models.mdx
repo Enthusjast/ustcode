@@ -1,0 +1,143 @@
+---
+title: Models
+description: Select and configure built-in or custom models in USTCode.
+---
+
+USTCode includes two built-in providers, **USTC TokenWorks** and **USTC TokenPlan**. Models from other services are available after you add them as custom providers. See [Providers](/docs/providers).
+
+## Select a model
+
+### USTC TokenWorks
+
+Connect to USTC TokenWorks from **Settings → Providers**, or run `ustcode auth login` and select it. Complete browser sign-in; USTCode then loads the current authorized model catalog. The USTCode server and browser must run on the same machine for the loopback callback. No API key environment variable is needed.
+
+Select a model with `/models`. Model IDs are assigned by the service and may change; the full ID uses `ustc-tokenworks/<model-id>`. Sign-in does not replace an existing model selection or configured default.
+
+### USTC TokenPlan
+
+Set `USTC_TOKENPLAN_API_KEY` in the environment of the USTCode server, then run `/models` to choose a TokenPlan model:
+
+```bash
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+```text
+/models
+```
+
+The built-in model IDs are:
+
+- `qwen-chat`
+- `qwen-reasoner`
+- `qwen3.5`
+- `qwen3.5-thinking`
+- `qwen3.5-non-thinking`
+- `claude-haiku-4-5`
+- `claude-haiku-4-5-20251001`
+- `claude-sonnet-4-6`
+- `deepseek-v4-flash-ascend`
+- `deepseek-v4-flash-ascend1`
+- `smart/reasoning`
+- `smart/default`
+- `qwen3.8-reasoner`
+- `qwen3.8-flash-next`
+- `qwen3.8-flash-next-2`
+- `qwen3.8-chat`
+- `unlimited-ocr`
+- `deepseek-flash-2`
+- `glm-5.3-flash`
+- `deepseek-flash`
+
+All are configured for reasoning and tool calls. The gateway does not declare context/output limits for most models, so
+USTCode uses 128K/16K fallbacks. `smart/default` uses a conservative 128K/8K limit due to its multi-deployment routing.
+Only `qwen3.8-flash-next-2` has gateway-declared image input support; undeclared modalities are treated as text-only.
+The `claude-*` IDs are gateway aliases and do not imply native Anthropic model backends. TokenPlan input/output prices
+are converted from gateway per-token rates to per-million-token catalog values. For aliases with multiple deployments,
+the highest observed rate is used. The gateway does not declare a currency, so treat the displayed prices as indicative
+and verify actual charges with `/key/spend/report`.
+
+## Model IDs and defaults
+
+The full model ID uses `provider-id/model-id`, for example `ustc-tokenplan/qwen-chat`. Set `model` in `ustcode.json`
+or `ustcode.jsonc` to choose a default for new work:
+
+```jsonc title="ustcode.jsonc"
+{
+  "$schema": "https://ustcode.enthusjast.cc/config.json",
+  "model": "ustc-tokenplan/qwen-chat",
+}
+```
+
+No provider-specific default is pinned by TokenPlan. If no default is configured, USTCode retains its normal
+default-model fallback behavior. A model already selected for a session takes precedence over the config default.
+
+You can also set a model for one CLI run:
+
+```bash
+ustcode run --model ustc-tokenplan/qwen3.8-reasoner#high "Review this change"
+```
+
+## Variants and request options
+
+Variants select named model settings, such as reasoning effort. TokenPlan models expose `low`, `medium`, and `high`
+effort variants. Add `#variant` to the model ID to select one.
+
+Provider, model, and variant configuration can set `settings`, `headers`, and `body`. These are package-specific and
+are combined in that order, with the variant applied last.
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "ustc-tokenplan": {
+      "models": {
+        "qwen3.8-reasoner": {
+          "settings": {
+            "reasoningEffort": "high",
+          },
+          "headers": {
+            "X-Model-Tier": "coding",
+          },
+          "body": {
+            "store": false,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+## Custom models
+
+Define other models under a custom provider. Specify accurate capabilities and limits for the API:
+
+```jsonc title="ustcode.jsonc"
+{
+  "providers": {
+    "acme": {
+      "env": ["ACME_API_KEY"],
+      "package": "@ustcode-ai/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://llm.acme.example/v1",
+      },
+      "models": {
+        "coder": {
+          "modelID": "upstream-coder-v2",
+          "capabilities": {
+            "tools": true,
+            "input": ["text"],
+            "output": ["text"],
+          },
+          "limit": {
+            "context": 128000,
+            "output": 16000,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+The selectable model ID is `acme/coder`; `modelID` is sent to the service. See [Providers](/docs/providers) for custom provider options.

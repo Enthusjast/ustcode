@@ -1,0 +1,50 @@
+---
+title: "Providers"
+description: "Connect USTC TokenPlan and manage provider credentials from the CLI or TUI."
+---
+
+USTCode includes USTC TokenPlan as its only built-in model provider. Other integrations are available when you add a
+custom provider to your configuration.
+
+## Connect TokenPlan
+
+Run `/connect` in the TUI and select **USTC TokenPlan**, or save a key from the CLI:
+
+```bash
+ustcode auth login ustc-tokenplan --method key
+```
+
+You can also provide the key through the server environment:
+
+```bash
+export USTC_TOKENPLAN_API_KEY="your-api-key"
+ustcode
+```
+
+For a managed background server, set the variable in its environment:
+
+```bash
+ustcode service set env USTC_TOKENPLAN_API_KEY your-api-key
+ustcode auth list
+```
+
+Environment credentials are read by the server that runs model requests. They are not saved accounts, so unset the
+variable to disconnect. A saved account takes precedence over an environment connection for the same integration.
+
+## Custom providers
+
+Custom providers can declare credential environment variables with their `env` field. Their API keys can be read from
+the server environment or entered using the provider's available connect method. See [Providers](/providers) for
+configuration.
+
+## Manage saved accounts
+
+List or remove saved credentials with the CLI:
+
+```bash
+ustcode auth list
+ustcode auth logout ustc-tokenplan
+```
+
+The TUI `/connect` screen provides the same account management flow. Saved credentials are stored in the local
+USTCode database; use the CLI or TUI to manage them rather than editing the database directly.

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0b0b0b" />
+  <g fill="none" stroke="#414141" stroke-width="2">
+    <rect x="32" y="32" width="1136" height="566" />
+    <path d="M120 32v566M1080 32v566M32 120h1136M32 510h1136" />
+  </g>
+  <g transform="translate(326 231)">
+    <rect width="96" height="96" rx="8" fill="#171717" />
+    <path d="M57 42v24H33V42h24Z" fill="#777" />
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M69 78H21V18h48V78ZM57 30H33v36h24V30Z" fill="#f5f5f5" />
+  </g>
+  <text
+    x="468"
+    y="294"
+    fill="#f5f5f5"
+    font-family="IBM Plex Mono, DejaVu Sans Mono, monospace"
+    font-size="74"
+    font-weight="600"
+    letter-spacing="-5"
+  >USTCODE</text>
+  <text
+    x="600"
+    y="382"
+    fill="#b9b9b9"
+    text-anchor="middle"
+    font-family="IBM Plex Mono, DejaVu Sans Mono, monospace"
+    font-size="30"
+    letter-spacing="0.5"
+  >The open source AI coding agent</text>
+</svg>

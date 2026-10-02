@@ -1,0 +1,74 @@
+---
+title: "Intro"
+---
+
+USTCode is an open source AI coding agent. It’s available as a terminal-based interface, desktop app, or web app.
+
+
+## CLI
+
+<CodeTabs
+  id="install"
+  label="Install method"
+  tabs={[
+    { label: "curl", code: "curl -fsSL https://ustcode.enthusjast.cc/install | bash" },
+    { label: "npm", code: "npm install -g @ustcode-ai/cli" },
+    { label: "bun", code: "bun install -g --trust @ustcode-ai/cli" },
+    { label: "pnpm", code: "pnpm add -g --allow-build=@ustcode-ai/cli @ustcode-ai/cli" },
+    { label: "yarn", code: "yarn global add @ustcode-ai/cli" },
+    { label: "vite+", code: "vp install -g @ustcode-ai/cli" },
+  ]}
+/>
+
+The npm package uses a postinstall script to select the native `ustcode` binary for your platform. The Bun and pnpm commands
+explicitly allow the required script; Vite+ requires no additional flag.
+
+Windows package managers are not supported.
+
+
+Download a standalone CLI binary for your platform.
+
+- **macOS:** [Apple silicon](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-darwin-arm64.zip) · [Intel](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-darwin-x64.zip) · [Intel (baseline)](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-darwin-x64-baseline.zip)
+- **Windows:** [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-windows-arm64.zip) · [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-windows-x64.zip) · [x64 (baseline)](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-windows-x64-baseline.zip)
+- **Linux (glibc):** [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-arm64.tar.gz) · [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-x64.tar.gz) · [x64 (baseline)](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-x64-baseline.tar.gz)
+- **Linux (musl):** [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-arm64-musl.tar.gz) · [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-x64-musl.tar.gz) · [x64 (baseline)](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-linux-x64-baseline-musl.tar.gz)
+
+## Desktop
+
+Download the latest USTCode Desktop build for your platform.
+
+- **macOS:** [Apple silicon](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-mac-arm64.dmg) · [Intel](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-mac-x64.dmg)
+- **Windows:** [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-win-x64.exe) · [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-win-arm64.exe)
+- **Linux (.deb):** [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-amd64.deb) · [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-arm64.deb)
+- **Linux (.rpm):** [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-x86_64.rpm) · [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-aarch64.rpm)
+- **Linux (AppImage):** [x64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-x86_64.AppImage) · [ARM64](https://files.ustcode.enthusjast.cc/bin/3.0.0/ustcode-desktop-linux-arm64.AppImage)
+
+
+## Web
+
+Access the USTCode web interface with the `ustcode pair` command.
+
+```bash
+$ ustcode pair
+
+  URLs      http://127.0.0.1:49374
+  Username  ustcode
+  Password  ********
+```
+
+---
+
+## Connect
+
+USTCode has built in support for many LLM providers - you can connect to them
+directly [in the TUI](/cli/providers) with `/connect`.
+
+See [Providers](/providers) to configure custom providers.
+
+---
+
+## Customize
+
+Make USTCode your own by editing the [USTCode config](/config), [loading plugins](/plugins), [connecting MCP
+servers](/mcp-servers), or [creating commands](/commands). For terminal interface themes and keybindings, see [CLI
+settings](/cli/config).
