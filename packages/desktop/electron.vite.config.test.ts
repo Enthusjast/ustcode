@@ -3,7 +3,7 @@ import { loadConfigFromFile, MainConfigFactory } from "electron-vite"
 import { build } from "vite"
 import pkg from "./package.json"
 
-test.each(["build", "serve"] as const)("configures minification for %s", async (command) => {
+test.each(["build", "serve"] as const)("configures renderer output for %s", async (command) => {
   const result = await loadConfigFromFile(
     { command, mode: command === "build" ? "production" : "development" },
     `${import.meta.dirname}/electron.vite.config.ts`,
@@ -12,7 +12,7 @@ test.each(["build", "serve"] as const)("configures minification for %s", async (
   expect(result?.config.main?.build?.minify).toBe(command === "build")
   expect(result?.config.preload?.build?.minify).toBe(command === "build")
   expect(result?.config.renderer?.build?.minify).toBe(command === "build")
-  expect(result?.config.renderer?.build?.sourcemap).toBe(true)
+  expect(result?.config.renderer?.build?.sourcemap).toBe(false)
 })
 
 test("onboarding preview is enabled only by the development test flag", async () => {

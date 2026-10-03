@@ -10,22 +10,6 @@ const channel = (() => {
 const nodePtyPkg = `@lydell/node-pty-${process.platform}-${process.arch}`
 
 const appPlugin = (await import("@ustcode-ai/app/vite")).default
-const sentry =
-  process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT
-    ? (await import("@sentry/vite-plugin")).sentryVitePlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
-        telemetry: false,
-        release: {
-          name: process.env.SENTRY_RELEASE ?? process.env.VITE_SENTRY_RELEASE,
-        },
-        sourcemaps: {
-          assets: "./out/renderer/**",
-          filesToDeleteAfterUpload: "./out/renderer/**/*.map",
-        },
-      })
-    : false
 
 // Every module the entry reaches through static imports lands in one chunk. Automatic splitting
 // otherwise fragments the initial graph into ~50 files shared with lazy routes, and each file costs
@@ -122,12 +106,12 @@ const require = __cjs_mod__.createRequire(import.meta.url);
         command === "serve" && process.env.USTCODE_TEST_ONBOARDING === "1",
       ),
     },
-    plugins: [appPlugin, sentry],
+    plugins: [appPlugin],
     publicDir: "../../../app/public",
     root: "src/renderer",
     build: {
       minify: command === "build",
-      sourcemap: true,
+      sourcemap: false,
       rolldownOptions: {
         input: {
           main: "src/renderer/index.html",

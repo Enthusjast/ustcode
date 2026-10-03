@@ -10,27 +10,18 @@ on:
 jobs:
   sync-locales:
     if: false
-    #if: github.actor != 'ustcode-agent[bot]'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          persist-credentials: false
           fetch-depth: 0
           ref: ${{ github.ref_name }}
 
       - name: Setup Bun
         uses: ./.github/actions/setup-bun
-
-      - name: Setup git committer
-        id: committer
-        uses: ./.github/actions/setup-git-committer
-        with:
-          ustcode-app-id: ${{ vars.USTCODE_APP_ID }}
-          ustcode-app-secret: ${{ secrets.USTCODE_APP_SECRET }}
 
       - name: Compute changed English docs
         id: changes
@@ -94,6 +85,8 @@ jobs:
             echo "No locale docs changes to commit"
             exit 0
           fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "docs(i18n): sync locale docs from english changes"
           git pull --rebase --autostash origin "$GITHUB_REF_NAME"

@@ -244,6 +244,7 @@ export const ErrorPage: Component<ErrorPageProps> = (props) => {
 
   onMount(() => {
     void ensureFatalErrorRecorded().catch(() => undefined)
+    if (!import.meta.env.VITE_SENTRY_DSN) return
     void import("@sentry/solid")
       .then(({ captureException, isEnabled }) => {
         if (isEnabled()) setStore("captureException", () => captureException)

@@ -76,7 +76,8 @@ export function AppBaseProviders(
           <UiI18nBridge>
             <ErrorBoundary
               fallback={(error) => {
-                void import("@sentry/solid").then(({ captureException }) => captureException(error))
+                if (import.meta.env.VITE_SENTRY_DSN)
+                  void import("@sentry/solid").then(({ captureException }) => captureException(error))
                 return <ErrorPage error={error} />
               }}
             >

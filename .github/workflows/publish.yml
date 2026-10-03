@@ -1,5 +1,5 @@
 name: publish
-run-name: "${{ format('release {0}', inputs.bump) }}"
+run-name: "publish ${{ inputs.version || inputs.bump || github.ref_name }}"
 
 on:
   push:
@@ -41,7 +41,7 @@ env:
 
 jobs:
   version:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     if: github.repository == 'Enthusjast/ustcode'
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
@@ -57,21 +57,12 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      - name: Setup git committer
-        id: committer
-        uses: ./.github/actions/setup-git-committer
-        with:
-          ustcode-app-id: ${{ vars.USTCODE_APP_ID }}
-          ustcode-app-secret: ${{ secrets.USTCODE_APP_SECRET }}
-
       - id: version
         run: |
           ./script/version.ts
         env:
-          GH_TOKEN: ${{ steps.committer.outputs.token }}
           USTCODE_BUMP: ${{ inputs.bump }}
           USTCODE_VERSION: ${{ inputs.version }}
-          USTCODE_API_KEY: ${{ secrets.USTCODE_API_KEY }}
           GH_REPO: ${{ (github.ref_name == 'beta' && 'Enthusjast/ustcode') || github.repository }}
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -81,7 +72,7 @@ jobs:
 
   build-cli:
     needs: version
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     if: github.repository == 'Enthusjast/ustcode'
     steps:
@@ -93,13 +84,6 @@ jobs:
         with:
           bun-version: 1.4.2
 
-      - name: Setup git committer
-        id: committer
-        uses: ./.github/actions/setup-git-committer
-        with:
-          ustcode-app-id: ${{ vars.USTCODE_APP_ID }}
-          ustcode-app-secret: ${{ secrets.USTCODE_APP_SECRET }}
-
       - name: Build preview CLI
         id: build
         run: ./packages/cli/script/build.ts ${{ (github.ref_name == 'beta' && '--sourcemaps') || '' }}
@@ -108,73 +92,19 @@ jobs:
           USTCODE_VERSION: ${{ needs.version.outputs.version }}
           USTCODE_RELEASE: ${{ needs.version.outputs.release }}
           GH_REPO: ${{ needs.version.outputs.repo }}
-          GH_TOKEN: ${{ steps.committer.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ustcode-preview-cli-unsigned
+          name: ustcode-preview-cli
           path: packages/cli/dist/cli-*
 
     outputs:
       version: ${{ needs.version.outputs.version }}
 
-  sign-cli-macos:
-    needs: build-cli
-    runs-on: macos-26
-    if: github.repository == 'Enthusjast/ustcode'
-    steps:
-      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
-
-      - uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
-        with:
-          keychain: build
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: ustcode-preview-cli-unsigned
-          path: packages/cli/dist
-
-      - name: Sign macOS CLI binaries
-        run: |
-          identity=$(security find-identity -v -p codesigning build.keychain | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -n 1)
-          if [ -z "$identity" ]; then
-            echo "Developer ID Application identity not found"
-            exit 1
-          fi
-
-          found=0
-          for file in packages/cli/dist/cli-darwin-*/bin/ustcode; do
-            if [ ! -f "$file" ]; then
-              continue
-            fi
-            found=1
-            codesign \
-              --force \
-              --timestamp \
-              --options runtime \
-              --entitlements packages/cli/script/entitlements.plist \
-              --sign "$identity" \
-              "$file"
-            codesign --verify --deep --strict --verbose=4 "$file"
-            codesign --display --requirements - "$file"
-          done
-
-          if [ "$found" -eq 0 ]; then
-            echo "No macOS CLI binaries found"
-            exit 1
-          fi
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: ustcode-preview-cli-macos
-          path: packages/cli/dist/cli-*
-          if-no-files-found: error
-
   build-node-app-archive:
     needs: version
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     if: github.repository == 'Enthusjast/ustcode' && !(github.ref_name == 'v2' && (inputs.bump || inputs.version))
     steps:
@@ -199,21 +129,23 @@ jobs:
       - version
       - build-node-app-archive
     if: github.repository == 'Enthusjast/ustcode' && !(github.ref_name == 'v2' && (inputs.bump || inputs.version))
+    env:
+      USTCODE_MACOS_UNSIGNED: "true"
     strategy:
       fail-fast: false
       matrix:
         settings:
           - target: linux-arm64
-            host: blacksmith-4vcpu-ubuntu-2404-arm
+            host: ubuntu-24.04-arm
           - target: linux-x64
-            host: blacksmith-4vcpu-ubuntu-2404
+            host: ubuntu-24.04
           - target: darwin-arm64
             host: macos-26
           - target: windows-arm64
-            host: blacksmith-4vcpu-windows-2025
+            host: windows-2025
             bun_install_flags: --cpu=*
           - target: windows-x64
-            host: blacksmith-4vcpu-windows-2025
+            host: windows-2025
     runs-on: ${{ matrix.settings.host }}
     defaults:
       run:
@@ -251,88 +183,14 @@ jobs:
           path: packages/cli/dist/node/cli-node-*
           if-no-files-found: error
 
-  sign-cli-windows:
-    needs:
-      - sign-cli-macos
-    runs-on: blacksmith-4vcpu-windows-2025
-    if: github.repository == 'Enthusjast/ustcode' && (github.ref_name == 'v2' || github.ref_name == 'beta')
-    env:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_TRUSTED_SIGNING_ACCOUNT_NAME: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
-      AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE: ${{ secrets.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE }}
-      AZURE_TRUSTED_SIGNING_ENDPOINT: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
-    steps:
-      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: ustcode-preview-cli-macos
-          path: packages/cli/dist
-
-      - name: Azure login
-        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-
-      - uses: azure/artifact-signing-action@b443cf8ea4124818d2ea9f043cba29fc3ec47b16 # v1.2.0
-        with:
-          endpoint: ${{ env.AZURE_TRUSTED_SIGNING_ENDPOINT }}
-          signing-account-name: ${{ env.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
-          certificate-profile-name: ${{ env.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE }}
-          files: |
-            ${{ github.workspace }}\packages\cli\dist\cli-windows-arm64\bin\ustcode.exe
-            ${{ github.workspace }}\packages\cli\dist\cli-windows-x64\bin\ustcode.exe
-            ${{ github.workspace }}\packages\cli\dist\cli-windows-x64-baseline\bin\ustcode.exe
-          exclude-environment-credential: true
-          exclude-workload-identity-credential: true
-          exclude-managed-identity-credential: true
-          exclude-shared-token-cache-credential: true
-          exclude-visual-studio-credential: true
-          exclude-visual-studio-code-credential: true
-          exclude-azure-cli-credential: false
-          exclude-azure-powershell-credential: true
-          exclude-azure-developer-cli-credential: true
-          exclude-interactive-browser-credential: true
-
-      - name: Verify Windows CLI signatures
-        shell: pwsh
-        run: |
-          $files = @(
-            "${{ github.workspace }}\packages\cli\dist\cli-windows-arm64\bin\ustcode.exe",
-            "${{ github.workspace }}\packages\cli\dist\cli-windows-x64\bin\ustcode.exe",
-            "${{ github.workspace }}\packages\cli\dist\cli-windows-x64-baseline\bin\ustcode.exe"
-          )
-
-          foreach ($file in $files) {
-            $sig = Get-AuthenticodeSignature $file
-            if ($sig.Status -ne "Valid") {
-              throw "Invalid signature for ${file}: $($sig.Status)"
-            }
-          }
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: ustcode-preview-cli
-          path: packages/cli/dist/cli-*
-          if-no-files-found: error
-
   build-electron:
     needs:
       - version
-      - sign-cli-windows
+      - build-cli
     if: github.repository == 'Enthusjast/ustcode' && (github.ref_name != 'v2' || needs.version.outputs.release != '')
     continue-on-error: false
     env:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_TRUSTED_SIGNING_ACCOUNT_NAME: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
-      AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE: ${{ secrets.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE }}
-      AZURE_TRUSTED_SIGNING_ENDPOINT: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+      USTCODE_MACOS_UNSIGNED: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -349,13 +207,13 @@ jobs:
           - host: "windows-2025"
             target: aarch64-pc-windows-msvc
             platform_flag: --win --arm64
-          - host: "blacksmith-4vcpu-windows-2025"
+          - host: "windows-2025"
             target: x86_64-pc-windows-msvc
             platform_flag: --win
-          - host: "blacksmith-4vcpu-ubuntu-2404"
+          - host: "ubuntu-24.04"
             target: x86_64-unknown-linux-gnu
             platform_flag: --linux
-          - host: "blacksmith-4vcpu-ubuntu-2404-arm"
+          - host: "ubuntu-24.04-arm"
             target: aarch64-unknown-linux-gnu
             platform_flag: --linux --arm64
     runs-on: ${{ matrix.settings.host }}
@@ -367,28 +225,9 @@ jobs:
           name: ustcode-preview-cli
           path: packages/cli/dist
 
-      - uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
-        if: runner.os == 'macOS'
-        with:
-          keychain: build
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-
-      - name: Setup Apple API Key
-        if: runner.os == 'macOS'
-        run: echo "${{ secrets.APPLE_API_KEY_PATH }}" > $RUNNER_TEMP/apple-api-key.p8
-
       - uses: ./.github/actions/setup-bun
         with:
           install-flags: ${{ matrix.settings.bun_install_flags }}
-
-      - name: Azure login
-        if: runner.os == 'Windows'
-        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
-        with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -411,13 +250,6 @@ jobs:
           sudo apt-get install -y --no-install-recommends -o dir::cache::archives="$HOME/apt-cache" rpm
           sudo chmod -R a+rw ~/apt-cache
 
-      - name: Setup git committer
-        id: committer
-        uses: ./.github/actions/setup-git-committer
-        with:
-          ustcode-app-id: ${{ vars.USTCODE_APP_ID }}
-          ustcode-app-secret: ${{ secrets.USTCODE_APP_SECRET }}
-
       - name: Prepare
         run: bun ./scripts/prepare.ts
         working-directory: packages/desktop
@@ -434,13 +266,6 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
           USTCODE_VERSION: ${{ needs.version.outputs.version }}
           USTCODE_CHANNEL: ${{ (github.ref_name == 'beta' && 'beta') || 'prod' }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ vars.WEB_SENTRY_PROJECT }}
-          SENTRY_RELEASE: desktop@${{ needs.version.outputs.version }}
-          VITE_SENTRY_DSN: ${{ vars.WEB_SENTRY_DSN }}
-          VITE_SENTRY_ENVIRONMENT: ${{ (github.ref_name == 'beta' && 'beta') || 'production' }}
-          VITE_SENTRY_RELEASE: desktop@${{ needs.version.outputs.version }}
           USTCODE_CLI_TARGET: ${{ matrix.settings.target }}
           USTCODE_CLI_DIST: ${{ github.workspace }}/packages/cli/dist
 
@@ -451,11 +276,7 @@ jobs:
         timeout-minutes: 60
         env:
           USTCODE_CHANNEL: ${{ (github.ref_name == 'beta' && 'beta') || 'prod' }}
-          GH_TOKEN: ${{ steps.committer.outputs.token }}
-          CSC_KEYCHAIN: build.keychain
-          APPLE_API_KEY: ${{ runner.temp }}/apple-api-key.p8
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: Package (no publish)
         if: ${{ !needs.version.outputs.release }}
@@ -486,22 +307,6 @@ jobs:
           fi
           tar -czf "$OUT_NAME" -C "$(dirname "$APP_PATH")" "$(basename "$APP_PATH")"
 
-      - name: Verify signed Windows Electron artifacts
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $files = @()
-          $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*.exe" | Select-Object -ExpandProperty FullName
-          $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*unpacked\*.exe" | Select-Object -ExpandProperty FullName
-          $files += Get-ChildItem "${{ github.workspace }}\packages\desktop\dist\*unpacked\resources\ustcode-cli.exe" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-
-          foreach ($file in $files | Select-Object -Unique) {
-            $sig = Get-AuthenticodeSignature $file
-            if ($sig.Status -ne "Valid") {
-              throw "Invalid signature for ${file}: $($sig.Status)"
-            }
-          }
-
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ustcode-desktop-${{ matrix.settings.target }}
@@ -517,13 +322,11 @@ jobs:
     needs:
       - version
       - build-cli
-      - sign-cli-macos
       - build-node-app-archive
       - build-node-cli
-      - sign-cli-windows
       - build-electron
     if: always() && !failure() && !cancelled()
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
 
@@ -559,40 +362,19 @@ jobs:
           path: /tmp/desktop
           merge-multiple: true
 
-      - name: Setup git committer
-        id: committer
-        uses: ./.github/actions/setup-git-committer
-        with:
-          ustcode-app-id: ${{ vars.USTCODE_APP_ID }}
-          ustcode-app-secret: ${{ secrets.USTCODE_APP_SECRET }}
+      - name: Configure git committer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - run: ./script/publish.ts
         env:
           USTCODE_VERSION: ${{ needs.version.outputs.version }}
           USTCODE_RELEASE: ${{ needs.version.outputs.release }}
-          AUR_KEY: ${{ secrets.AUR_KEY }}
-          GITHUB_TOKEN: ${{ steps.committer.outputs.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ needs.version.outputs.repo }}
           NPM_CONFIG_PROVENANCE: false
           LATEST_YML_DIR: /tmp/latest-yml
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           USTCODE_DESKTOP_DIST: /tmp/desktop
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-  notify-discord-v2:
-    needs:
-      - version
-      - publish
-    if: github.repository == 'Enthusjast/ustcode' && github.ref_name == 'v2' && needs.version.outputs.release && needs.publish.result == 'success'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    steps:
-      # Unlike dev, V2 publishes a tag rather than a GitHub Release event.
-      - name: Announce V2 release in Discord
-        uses: SethCohen/github-releases-to-discord@24d166886aee4646d448c8a389ff9e1ebcab3682 # v1.20.0
-        with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
-          release_name: USTCode V2 ${{ needs.version.outputs.tag }}
-          release_body: ${{ inputs.release_notes }}
-          release_html_url: https://github.com/${{ github.repository }}/tree/${{ needs.version.outputs.tag }}

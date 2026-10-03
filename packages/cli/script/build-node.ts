@@ -130,7 +130,13 @@ for (const target of targets) {
   await writeFile("dist-node/sea.json", `${JSON.stringify(config, null, 2)}\n`)
   run(builder, ["--build-sea", "dist-node/sea.json"])
   if (target.platform !== "win32") await chmod(output, 0o755)
-  if (target.platform === "darwin" && process.platform === "darwin") run("codesign", ["--sign", "-", output])
+  if (
+    target.platform === "darwin" &&
+    process.platform === "darwin" &&
+    process.env.USTCODE_MACOS_UNSIGNED !== "true"
+  ) {
+    run("codesign", ["--sign", "-", output])
+  }
   if (target.platform === "darwin" && process.platform !== "darwin") {
     console.warn(`${output} must be signed on macOS before it can run`)
   }

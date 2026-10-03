@@ -23,6 +23,20 @@ test("signs the macOS app without signing the DMG", async () => {
   expect(config.dmg?.sign).not.toBe(true)
 })
 
+test("skips macOS signing and notarization for unsigned release builds", async () => {
+  const previous = process.env.USTCODE_MACOS_UNSIGNED
+  process.env.USTCODE_MACOS_UNSIGNED = "true"
+  try {
+    const config = (await import("./electron-builder.config.ts?mac-unsigned")).default as Configuration
+    expect(config.mac?.identity).toBeNull()
+    expect(config.mac?.notarize).toBe(false)
+    expect(config.mac?.sign).toBeUndefined()
+  } finally {
+    if (previous === undefined) delete process.env.USTCODE_MACOS_UNSIGNED
+    else process.env.USTCODE_MACOS_UNSIGNED = previous
+  }
+})
+
 for (const channel of channels) {
   test(`disables security code AutoFill by default for ${channel.channel}`, async () => {
     const previous = process.env.USTCODE_CHANNEL

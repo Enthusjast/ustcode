@@ -39,8 +39,6 @@
     "@ustcode-ai/schema": "workspace:*",
     "@ustcode-ai/plugin-browser": "workspace:*",
     "@ustcode-ai/ui": "workspace:*",
-    "@sentry/solid": "catalog:",
-    "@sentry/vite-plugin": "catalog:",
     "@solid-primitives/storage": "catalog:",
     "@solidjs/meta": "catalog:",
     "@solidjs/router": "catalog:",
