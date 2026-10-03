@@ -16,7 +16,7 @@
 			"binding": "DB",
 			"database_name": "ustcode-update",
 			// Create this database in the USTCode Cloudflare account before deployment.
-			"database_id": "REPLACE_WITH_USTCODE_UPDATE_DATABASE_ID",
+			"database_id": "06dd47c5-f6a9-4d2f-9bc6-9087a2f1deb5",
 			"migrations_dir": "migrations",
 		},
 		{
