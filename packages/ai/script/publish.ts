@@ -34,7 +34,7 @@ if (!alreadyPublished) {
   try {
     await $`bun pm pack`
     if (Script.dryRun) console.log(`dry-run: would publish ${pkg.name}@${pkg.version} from ${tarball}`)
-    if (!Script.dryRun) await $`npm publish *.tgz --tag ${Script.channel} --access public`
+    if (!Script.dryRun) await $`npm publish ${tarball} --tag ${Script.channel} --access public`
   } finally {
     await Bun.write("package.json", originalText)
   }

@@ -24,7 +24,10 @@ async function publish(dir: string, name: string, version: string) {
   // Keep local tarballs available to downstream publishers when retrying a release.
   await $`bun pm pack`.cwd(dir)
   if (dryRun) console.log(`dry-run: would publish ${name}@${version} from ${dir}`)
-  if (!dryRun && !exists) await $`npm publish *.tgz --access public --tag ${Script.channel}`.cwd(dir)
+  if (!dryRun && !exists) {
+    const tarball = `${name.replace("@", "").replace("/", "-")}-${version}.tgz`
+    await $`npm publish ${tarball} --access public --tag ${Script.channel}`.cwd(dir)
+  }
 }
 
 async function publishDistribution(input: {
