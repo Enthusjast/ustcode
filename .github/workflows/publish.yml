@@ -372,6 +372,7 @@ jobs:
           USTCODE_VERSION: ${{ needs.version.outputs.version }}
           USTCODE_RELEASE: ${{ needs.version.outputs.release }}
           GITHUB_TOKEN: ${{ github.token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_REPO: ${{ needs.version.outputs.repo }}
           NPM_CONFIG_PROVENANCE: false
           LATEST_YML_DIR: /tmp/latest-yml
