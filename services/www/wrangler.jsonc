@@ -19,7 +19,7 @@
       "routes": [
         {
           "pattern": "dev.ustcode.enthusjast.cc/v2*",
-          "zone_name": "ustcode.enthusjast.cc",
+          "zone_name": "enthusjast.cc",
         },
       ],
     },
@@ -28,7 +28,7 @@
       "routes": [
         {
           "pattern": "ustcode.enthusjast.cc/v2*",
-          "zone_name": "ustcode.enthusjast.cc",
+          "zone_name": "enthusjast.cc",
         },
       ],
     },

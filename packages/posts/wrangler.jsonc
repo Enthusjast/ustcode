@@ -7,7 +7,7 @@
   "routes": [
     {
       "pattern": "ustcode.enthusjast.cc/posts*",
-      "zone_name": "ustcode.enthusjast.cc"
+      "zone_name": "enthusjast.cc"
     }
   ]
 }
